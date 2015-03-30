@@ -3,4 +3,7 @@ Collection of projects used to demo the features of [Typesafe conductR](http://t
 
 
 
-sbt backend/bundle:dist
+##### Build the **singlemicro** bundle
+
+
+>  sbt singlemicro/bundle:dist
