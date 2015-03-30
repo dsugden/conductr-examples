@@ -10,9 +10,6 @@ lazy val Akka  = "2.3.6"
 lazy val Spray = "1.3.1"
 
 
-
-//lazy val root = (project in file(".")).aggregate(singlemicro)
-
 lazy val singlemicro = (project in file("singlemicro"))
   .enablePlugins(JavaAppPackaging)
   .settings(
