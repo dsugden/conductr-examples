@@ -10,6 +10,7 @@ import akka.actor.ActorRef
 import akka.actor.ActorContext
 import akka.cluster.Cluster
 import com.boldradius.conductr.examples.Trivial
+import com.typesafe.conductr.bundlelib.akka.ClusterProperties
 import com.typesafe.config.ConfigFactory
 import spray.can.Http
 import spray.routing.HttpServiceActor
@@ -24,6 +25,8 @@ import scala.util.{Failure, Success}
   * 8089
   */
 object AkkaClusterFrontend extends App {
+
+  ClusterProperties.initialize()
 
 
   val httpHost = if (args.isEmpty) "localhost" else args(0)
@@ -96,7 +99,7 @@ class AkkaClusterFrontend() extends Actor with ActorLogging {
       backends(jobCounter % backends.size) forward Trivial
 
     case BackendRegistration if !backends.contains(sender()) =>
-      log.info("----------------  backend registered")
+      log.info("backend registered, adding to backends")
       context watch sender()
       backends = backends :+ sender()
 

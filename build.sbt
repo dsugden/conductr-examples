@@ -33,7 +33,7 @@ lazy val singlemicro = (project in file("singlemicro"))
 lazy val akkaclusterFront = (project in file("akkacluster"))
   .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
   .settings(
-    name := "akkaclusterFront",
+    name := "akkacluster-frontend",
     version  := "1.0.0",
     scalaVersion := scalaV,
     mainClass in (Compile, run) := Some("com.boldradius.conductr.examples.AkkaClusterFrontend"),
@@ -54,7 +54,7 @@ lazy val akkaclusterFront = (project in file("akkacluster"))
 lazy val akkaclusterBack = (project in file("akkacluster"))
   .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
   .settings(
-    name := "akkacluster",
+    name := "akkacluster-backend",
     version  := "1.0.0",
     scalaVersion := scalaV,
     mainClass in (Compile, run) := Some("com.boldradius.conductr.examples.AkkaClusterBackend"),

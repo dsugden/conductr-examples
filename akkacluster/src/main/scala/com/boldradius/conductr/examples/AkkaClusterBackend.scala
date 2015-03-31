@@ -3,6 +3,7 @@ package com.boldradius.conductr.examples
 import akka.actor._
 import akka.cluster.{Member, Cluster}
 import akka.cluster.ClusterEvent.{MemberRemoved, UnreachableMember, MemberEvent, MemberUp}
+import com.typesafe.conductr.bundlelib.akka.ClusterProperties
 import com.typesafe.config.ConfigFactory
 
 
@@ -11,18 +12,13 @@ import com.typesafe.config.ConfigFactory
  */
 object AkkaClusterBackend extends App{
 
+
+  ClusterProperties.initialize()
+
   val config =  ConfigFactory.parseString("akka.cluster.roles = [backend]").withFallback(ConfigFactory.load("backend"))
   val system = ActorSystem("AkkaConductRExamplesClusterSystem", config)
-  system.actorOf(Props(classOf[AkkaClusterBackend]), name = "akkaClusterBackend")
+  system.actorOf(Props(classOf[AkkaClusterBackend]))
 }
-
-
-
-
-
-
-
-
 
 
 sealed trait AkkaClusterBackendProtocol
@@ -36,11 +32,7 @@ class AkkaClusterBackend extends Actor with ActorLogging with AkkaClusterBackend
 
   val cluster = Cluster(context.system)
 
-  override def preStart(): Unit = {
-
-    cluster.subscribe(self, classOf[MemberEvent])
-
-  }
+  override def preStart(): Unit = cluster.subscribe(self, classOf[MemberEvent])
   override def postStop(): Unit = cluster.unsubscribe(self)
 
   def receive = {
@@ -60,7 +52,7 @@ class AkkaClusterBackend extends Actor with ActorLogging with AkkaClusterBackend
 
   def register(member: Member): Unit =
     if (member.hasRole("frontend")) {
-      log.info("___________  front end is registered")
+      log.info("front end is registered, sending BackendRegistration")
       context.actorSelection(RootActorPath(member.address) / "user" / "akkaClusterFrontend") ! BackendRegistration
 
     }
