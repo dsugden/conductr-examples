@@ -16,10 +16,11 @@ lazy val singlemicro = (project in file("singlemicro"))
     name := "singlemicro",
     version  := "1.0.0",
     scalaVersion := scalaV,
+    target := file("singlemicro") / "singlemicro",
     BundleKeys.nrOfCpus := 1.0,
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
-    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 0, Set.empty),"frontendcluster" -> Endpoint("tcp", 8082, Set.empty)),
+    BundleKeys.endpoints := Map("singlemicro" -> Endpoint("http", 8095, Set(URI("http:/singlemicro")))),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
     libraryDependencies ++= Dependencies.singlemicro,
     javaOptions ++= Seq(
@@ -30,18 +31,28 @@ lazy val singlemicro = (project in file("singlemicro"))
   )
 
 
-lazy val akkaclusterFront = (project in file("akkacluster"))
+
+lazy val akkaclusterApi = (project in file("akkaclusterapi"))
+  .settings(
+    name := "akkaclusterapi",
+    version  := "1.0.0",
+    scalaVersion := scalaV,
+    resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
+    libraryDependencies ++= Dependencies.akkacluster
+  )
+
+
+lazy val akkaclusterFront = (project in file("akkaclusterfront"))
   .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
   .settings(
     name := "akkaclusterFront",
     version  := "1.0.0",
     scalaVersion := scalaV,
-    mainClass in (Compile, run) := Some("com.boldradius.conductr.examples.AkkaClusterFrontend"),
-    target := file("akkacluster") / "front",
     BundleKeys.nrOfCpus := 1.0,
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
-    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 0, Set.empty),"backendcluster" -> Endpoint("tcp", 8083, Set.empty)),
+    BundleKeys.system := "AkkaConductRExamplesClusterSystem",
+    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8082, Set.empty),"frontendcluster" -> Endpoint("tcp", 8082, Set.empty)),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
     libraryDependencies ++= Dependencies.akkacluster,
     javaOptions ++= Seq(
@@ -49,20 +60,19 @@ lazy val akkaclusterFront = (project in file("akkacluster"))
       "-Xms128m", "-Xmx1024m"),
     // this enables custom javaOptions
     fork in run := true
-  )
+  ).dependsOn(akkaclusterApi)
 
-lazy val akkaclusterBack = (project in file("akkacluster"))
+lazy val akkaclusterBack = (project in file("akkaclusterback"))
   .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
   .settings(
     name := "akkaclusterBack",
     version  := "1.0.0",
     scalaVersion := scalaV,
-    mainClass in (Compile, run) := Some("com.boldradius.conductr.examples.AkkaClusterBackend"),
-    target := file("akkacluster") / "back",
     BundleKeys.nrOfCpus := 1.0,
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
-    BundleKeys.endpoints := Map("akkaclusterfront" -> Endpoint("http", 8083, Set(URI("http:/akkacluster")))),
+    BundleKeys.system := "AkkaConductRExamplesClusterSystem",
+    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8082, Set.empty),"backendcluster" -> Endpoint("tcp", 8082, Set.empty)),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
     libraryDependencies ++= Dependencies.akkacluster,
     javaOptions ++= Seq(
@@ -70,7 +80,7 @@ lazy val akkaclusterBack = (project in file("akkacluster"))
       "-Xms128m", "-Xmx1024m"),
     // this enables custom javaOptions
     fork in run := true
-  )
+  ).dependsOn(akkaclusterApi)
 
 
 
