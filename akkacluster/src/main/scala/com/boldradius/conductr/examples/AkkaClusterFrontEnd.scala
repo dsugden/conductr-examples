@@ -1,15 +1,10 @@
 package com.boldradius.conductr.examples
 
 import akka.actor._
-import akka.cluster.ClusterEvent.{MemberUp, UnreachableMember, MemberEvent, InitialStateAsEvents}
 import akka.io.IO
-import akka.routing.FromConfig
-import akka.util.Timeout
 import akka.util.Timeout
 import akka.actor.ActorRef
-import akka.actor.ActorContext
 import akka.cluster.Cluster
-import com.boldradius.conductr.examples.Trivial
 import com.typesafe.conductr.bundlelib.akka.ClusterProperties
 import com.typesafe.config.ConfigFactory
 import spray.can.Http

@@ -19,7 +19,7 @@ lazy val singlemicro = (project in file("singlemicro"))
     BundleKeys.nrOfCpus := 1.0,
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
-    BundleKeys.endpoints := Map("singlemicro" -> Endpoint("http", 8082, Set(URI("http:/singlemicro")))),
+    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 0, Set.empty),"frontendcluster" -> Endpoint("tcp", 8082, Set.empty)),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
     libraryDependencies ++= Dependencies.singlemicro,
     javaOptions ++= Seq(
@@ -33,7 +33,7 @@ lazy val singlemicro = (project in file("singlemicro"))
 lazy val akkaclusterFront = (project in file("akkacluster"))
   .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
   .settings(
-    name := "akkacluster-frontend",
+    name := "akkaclusterFront",
     version  := "1.0.0",
     scalaVersion := scalaV,
     mainClass in (Compile, run) := Some("com.boldradius.conductr.examples.AkkaClusterFrontend"),
@@ -41,7 +41,7 @@ lazy val akkaclusterFront = (project in file("akkacluster"))
     BundleKeys.nrOfCpus := 1.0,
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
-    BundleKeys.endpoints := Map("akkaclusterfront" -> Endpoint("http", 8083, Set(URI("http:/akkacluster")))),
+    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 0, Set.empty),"backendcluster" -> Endpoint("tcp", 8083, Set.empty)),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
     libraryDependencies ++= Dependencies.akkacluster,
     javaOptions ++= Seq(
@@ -54,7 +54,7 @@ lazy val akkaclusterFront = (project in file("akkacluster"))
 lazy val akkaclusterBack = (project in file("akkacluster"))
   .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
   .settings(
-    name := "akkacluster-backend",
+    name := "akkaclusterBack",
     version  := "1.0.0",
     scalaVersion := scalaV,
     mainClass in (Compile, run) := Some("com.boldradius.conductr.examples.AkkaClusterBackend"),
