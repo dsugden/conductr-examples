@@ -1,48 +1,88 @@
 import ByteConversions._
 import com.typesafe.sbt.bundle.Import.BundleKeys
+import com.typesafe.sbt.SbtNativePackager._
+import NativePackagerKeys._
 
 
 name := "conductR-examples"
 
 version  := "1.0.0"
 
-lazy val Akka  = "2.3.6"
-lazy val Spray = "1.3.1"
-
+lazy val scalaV = "2.11.6"
 
 lazy val singlemicro = (project in file("singlemicro"))
-  .enablePlugins(JavaAppPackaging)
+  .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
   .settings(
     name := "singlemicro",
     version  := "1.0.0",
-    scalaVersion := "2.11.6",
+    scalaVersion := scalaV,
+    target := file("singlemicro") / "singlemicro",
     BundleKeys.nrOfCpus := 1.0,
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
-    BundleKeys.endpoints := Map("singlemicro" -> Endpoint("http", 8082, Set(URI("http:/singlemicro")))),
+    BundleKeys.endpoints := Map("singlemicro" -> Endpoint("http", 8095, Set(URI("http:/singlemicro")))),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
-    libraryDependencies ++=  Seq(
-      "com.typesafe.akka"          %% "akka-actor"      % Akka     % "compile",
-      "com.typesafe.akka"          %% "akka-slf4j"      % Akka     % "compile",
-      "ch.qos.logback"              % "logback-classic" % "1.1.2"  % "compile",
-      "javax.mail"                  % "mail"            % "1.4.5"  % "compile",
-      "io.spray"                   %% "spray-routing"   % Spray    % "compile",
-      "io.spray"                   %% "spray-can"       % Spray    % "compile",
-      "io.spray"                   %% "spray-client"    % Spray    % "compile",
-      "org.json4s"                 %% "json4s-native"   % "3.2.10" % "compile",
-      "com.typesafe.scala-logging" %% "scala-logging"   % "3.0.0"  % "compile",
-      "commons-io"                  % "commons-io"      % "2.4"    % "compile",
-      "org.scalatest"              %% "scalatest"       % "2.2.0"  % "test",
-      "com.typesafe.akka"          %% "akka-testkit"    % Akka     % "test",
-      "io.spray"                   %% "spray-testkit"   % Spray    % "test",
-      "com.typesafe.conductr"      %% "scala-conductr-bundle-lib"  % "0.6.1"
-    ),
+    libraryDependencies ++= Dependencies.singlemicro,
     javaOptions ++= Seq(
       "-Djava.library.path=" + (baseDirectory.value / "sigar").getAbsolutePath,
       "-Xms128m", "-Xmx1024m"),
     // this enables custom javaOptions
     fork in run := true
   )
+
+
+
+lazy val akkaclusterApi = (project in file("akkaclusterapi"))
+  .settings(
+    name := "akkaclusterapi",
+    version  := "1.0.0",
+    scalaVersion := scalaV,
+    resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
+    libraryDependencies ++= Dependencies.akkacluster
+  )
+
+
+lazy val akkaclusterFront = (project in file("akkaclusterfront"))
+  .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
+  .settings(
+    name := "akkaclusterFront",
+    version  := "1.0.0",
+    scalaVersion := scalaV,
+    BundleKeys.nrOfCpus := 1.0,
+    BundleKeys.memory := 64.MiB ,
+    BundleKeys.diskSpace := 5.MB,
+    BundleKeys.system := "AkkaConductRExamplesClusterSystem",
+    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8082, Set.empty),"frontendcluster" -> Endpoint("tcp", 8082, Set.empty)),
+    resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
+    libraryDependencies ++= Dependencies.akkacluster,
+    javaOptions ++= Seq(
+      "-Djava.library.path=" + (baseDirectory.value / "sigar").getAbsolutePath,
+      "-Xms128m", "-Xmx1024m"),
+    // this enables custom javaOptions
+    fork in run := true
+  ).dependsOn(akkaclusterApi)
+
+lazy val akkaclusterBack = (project in file("akkaclusterback"))
+  .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
+  .settings(
+    name := "akkaclusterBack",
+    version  := "1.0.0",
+    scalaVersion := scalaV,
+    BundleKeys.nrOfCpus := 1.0,
+    BundleKeys.memory := 64.MiB ,
+    BundleKeys.diskSpace := 5.MB,
+    BundleKeys.system := "AkkaConductRExamplesClusterSystem",
+    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8082, Set.empty),"backendcluster" -> Endpoint("tcp", 8082, Set.empty)),
+    resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
+    libraryDependencies ++= Dependencies.akkacluster,
+    javaOptions ++= Seq(
+      "-Djava.library.path=" + (baseDirectory.value / "sigar").getAbsolutePath,
+      "-Xms128m", "-Xmx1024m"),
+    // this enables custom javaOptions
+    fork in run := true
+  ).dependsOn(akkaclusterApi)
+
+
 
 
 
