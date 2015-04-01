@@ -1,7 +1,6 @@
 import ByteConversions._
 import com.typesafe.sbt.bundle.Import.BundleKeys
-import com.typesafe.sbt.SbtNativePackager._
-import NativePackagerKeys._
+import play.PlayScala
 
 
 name := "conductR-examples"
@@ -52,13 +51,12 @@ lazy val akkaclusterFront = (project in file("akkaclusterfront"))
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
     BundleKeys.system := "AkkaConductRExamplesClusterSystem",
-    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8082, Set.empty),"frontendcluster" -> Endpoint("tcp", 8082, Set.empty)),
+    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8083, Set(URI("http:/seed"))), "spray-http" -> Endpoint("http", 8095, Set(URI("http:/test")))),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
     libraryDependencies ++= Dependencies.akkacluster,
     javaOptions ++= Seq(
       "-Djava.library.path=" + (baseDirectory.value / "sigar").getAbsolutePath,
       "-Xms128m", "-Xmx1024m"),
-    // this enables custom javaOptions
     fork in run := true
   ).dependsOn(akkaclusterApi)
 
@@ -72,15 +70,34 @@ lazy val akkaclusterBack = (project in file("akkaclusterback"))
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
     BundleKeys.system := "AkkaConductRExamplesClusterSystem",
-    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8082, Set.empty),"backendcluster" -> Endpoint("tcp", 8082, Set.empty)),
+    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8083, Set.empty)),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
     libraryDependencies ++= Dependencies.akkacluster,
     javaOptions ++= Seq(
       "-Djava.library.path=" + (baseDirectory.value / "sigar").getAbsolutePath,
       "-Xms128m", "-Xmx1024m"),
-    // this enables custom javaOptions
     fork in run := true
   ).dependsOn(akkaclusterApi)
+
+
+
+
+
+lazy val playProject = (project in file("playProject"))
+  .enablePlugins(PlayScala,JavaAppPackaging,SbtTypesafeConductR)
+  .settings(
+    name := "playProject",
+    version  := "1.0.0",
+    scalaVersion := scalaV,
+    libraryDependencies ++= Dependencies.playProject,
+    BundleKeys.nrOfCpus := 1.0,
+    BundleKeys.memory := 64.MiB ,
+    BundleKeys.diskSpace := 5.MB,
+    BundleKeys.endpoints := Map("playproject" -> Endpoint("http", 9000, Set(URI("http:/test")))),
+    javaOptions ++= Seq("-Xms128m", "-Xmx1024m"),
+    fork in run := true
+  )
+
 
 
 
