@@ -20,12 +20,12 @@ The backend will join cluster, then register with front end. The frontend will f
     project akkaclusterFront
     clean
     bundle:dist
-    loadBundle <Tab for bundle file >  file:/Users/dave/projects/akka/conductrR-examples/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
+    loadBundle <Tab for bundle file >  <path to project>/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
     startBundle <bundleId>
 
     project akkaclusterBack
     clean
     bundle:dist
-    loadBundle <Tab for bundle file >  file:/Users/dave/projects/akka/conductrR-examples/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
+    loadBundle <Tab for bundle file >  <path to project>/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
     startBundle <bundleId>
 
