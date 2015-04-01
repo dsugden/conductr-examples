@@ -55,24 +55,75 @@ object AkkaClusterFrontend extends App with LazyLogging {
     }(identity)
 
 
+  logger.info(s"SEED NODES ${sys.props.get("akka.cluster.seed-nodes.0")}")
+
 
 
   implicit val system = ActorSystem("AkkaConductRExamplesClusterSystem", config)
 
 
-  val frontEnd = system.actorOf(Props(new AkkaClusterFrontend), name = "akkaClusterFrontend")
+  val frontEndActor = system.actorOf(Props(new AkkaClusterFrontend), name = "akkaClusterFrontend")
+  val frontEndHttpService = system.actorOf(Props(classOf[FrontEndHttpActor], frontEndActor), "akka-cluster-http-actor")
 
+
+  sys.env.get("SEED_HTTP_BIND_IP").flatMap{ seedHostIp =>
+    sys.env.get("SEED_HTTP_BIND_PORT").map{ seedPort =>
+
+      logger.info("Booting up seed service")
+
+      val seedActor = system.actorOf(Props(new SeedNodesActor(seedHostIp)), name = "seed-actor")
+      val seedHttpService = system.actorOf(Props(classOf[SeedNodesHttpActor], seedActor), "seed-http-actor")
+      implicit val timeout = Timeout(5.seconds)
+      IO(Http) ? Http.Bind(seedHttpService, interface = seedHostIp, port = seedPort.toInt)
+    }
+  }
+  implicit val timeout = Timeout(5.seconds)
+  IO(Http) ? Http.Bind(frontEndHttpService, interface = http._1, port = http._2)
   StatusService.signalStartedOrExit()
 
-  Cluster(system) registerOnMemberUp {
-    implicit val timeout = Timeout(5.seconds)
 
-    val service = system.actorOf(Props(classOf[FrontEndHttpActor], frontEnd), "akka-cluster-http-actor")
+}
 
-    IO(Http) ? Http.Bind(service, interface = http._1, port = http._2)
 
+case object GetSeed
+class SeedNodesActor(initial:String) extends Actor{
+  def receive:Receive = {
+    case GetSeed => sender() ! initial
   }
 }
+
+
+trait SeedNodesHttpRoute extends HttpServiceActor {
+  implicit val ec: ExecutionContext
+
+  implicit val timeout = Timeout(10 seconds)
+
+  import MarshallingSupport._
+
+  val seedActor: ActorRef
+
+  def route = {
+    get {
+      path("seeds") {
+        onComplete((seedActor ? GetSeed).mapTo[String]) {
+          case Success(r) => complete(r)
+          case Failure(t) => t.printStackTrace; complete(t.getMessage)
+        }
+      }
+    }
+  }
+}
+
+
+class SeedNodesHttpActor(sActor: ActorRef)
+  extends HttpServiceActor
+  with SeedNodesHttpRoute {
+  implicit val ec = context.dispatcher
+  override val seedActor = sActor
+  def receive = runRoute(route)
+}
+
+
 
 
 trait FrontEndHttpRoute extends HttpServiceActor {
@@ -101,9 +152,9 @@ class FrontEndHttpActor(fEndActor: ActorRef)
   with FrontEndHttpRoute {
   implicit val ec = context.dispatcher
   override val frontEndActor = fEndActor
-
   def receive = runRoute(route)
 }
+
 
 
 class AkkaClusterFrontend() extends Actor with ActorLogging {

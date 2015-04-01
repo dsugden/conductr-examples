@@ -5,15 +5,22 @@ import java.net.URL
 import akka.actor._
 import akka.cluster.{Member, Cluster}
 import akka.cluster.ClusterEvent.{MemberRemoved, UnreachableMember, MemberEvent, MemberUp}
+import akka.io.IO
 import com.typesafe.conductr.bundlelib.akka.{LocationService, ClusterProperties}
 import com.typesafe.conductr.bundlelib.akka.ImplicitConnectionContext
+import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits._
 import com.typesafe.conductr.bundlelib.scala.{Env, StatusService}
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import akka.pattern.pipe
+import spray.can.Http
 
-import scala.concurrent.Await
+import spray.http._
+import spray.client.pipelining._
+
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration._
+import scala.util.{Failure, Success}
 
 
 /**
@@ -21,7 +28,7 @@ import scala.concurrent.duration._
  */
 object AkkaClusterBackend extends App with LazyLogging {
 
-//  ClusterProperties.initialize()
+  ClusterProperties.initialize()
 
   val config =  ConfigFactory.parseString("akka.cluster.roles = [backend]").withFallback(ConfigFactory.load())
 
@@ -40,97 +47,53 @@ object AkkaClusterBackend extends App with LazyLogging {
   logger.info(s"akkaRemoteOtherIpsConcat ${sys.env.get("AKKA_REMOTE_OTHER_IPS")}")
   logger.info(s"akkaRemoteOtherPortsConcat ${sys.env.get("AKKA_REMOTE_OTHER_PORTS")}")
 
-  if( config.getString("akka.remote.netty.tcp.hostname") == "127.0.0.1"){
+
+  logger.info(s"SEED NODES ${sys.props.get("akka.cluster.seed-nodes.0")}")
+
+
+  if( !Env.isRunByConductR ){
     sys.props ++= List("akka.cluster.seed-nodes.0" -> "akka.tcp://AkkaConductRExamplesClusterSystem@127.0.0.1:8089")
   }
-
 
   val system = ActorSystem("AkkaConductRExamplesClusterSystem", config)
 
   system.actorOf(Props(classOf[AkkaClusterBackend]))
 
-
-
-
 }
 
 
 
 
 
-class AkkaClusterBackend extends Actor with ActorLogging with ImplicitConnectionContext  {
+class AkkaClusterBackend extends Actor with ActorLogging  {
 
   val cluster = Cluster(context.system)
 
-
-  import context.dispatcher
-
-  override def preStart(): Unit ={
-    val seed = Await.result(LocationService.lookup("/seed"), 20 seconds)
-
-    println("------------- HERE")
-
-    log.info("************  seed:  " + seed)
-
-    LocationService.lookup("/seed").pipeTo(self)
-
-
-  }
-
-
-
+  override def preStart(): Unit = cluster.subscribe(self, classOf[MemberEvent])
   override def postStop(): Unit = cluster.unsubscribe(self)
 
+  def receive = {
 
-  override def receive: Receive =
-    initial
-
-  private def initial: Receive = {
-    case Some(someService: String) =>
-      // We now have the seed, join the cluster
-
-      val url = new URL(someService)
-
-      log.info("---------seed url: " + someService)
-      log.info("---------URL: " + url.toString)
-      log.info("---------URL: " + url.getHost)
-
-      cluster.join(Address("tcp", "AkkaConductRExamplesClusterSystem", url.getHost, url.getPort))
-
-
-
-      cluster.subscribe(self, classOf[MemberEvent])
-      context.become(service)
-
-    case None =>
-      log.info("#############   no service found")
-      self ! (if (Env.isRunByConductR) PoisonPill else Some("http://127.0.0.1:9000"))
-  }
-
-  private def service: Receive = {
     case MemberUp(member) =>
-      log.info("-----------Member is Up: {}", member.address)
+      log.info("Member is Up: {}", member.address)
       register(member)
     case UnreachableMember(member) =>
-      log.info("----------Member detected as unreachable: {}", member)
+      log.info("Member detected as unreachable: {}", member)
     case MemberRemoved(member, previousStatus) =>
-      log.info("----------Member is Removed: {} after {}",
+      log.info("Member is Removed: {} after {}",
         member.address, previousStatus)
     case _: MemberEvent => // ignore
 
     case Trivial => sender() ! "AkkaClusterBackend success"
-
   }
 
   def register(member: Member): Unit =
     if (member.hasRole("frontend")) {
-      import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits._
-      log.info("--------front end is registered, sending BackendRegistration")
+      log.info("front end is registered, sending BackendRegistration")
       context.actorSelection(RootActorPath(member.address) / "user" / "akkaClusterFrontend") ! BackendRegistration
       StatusService.signalStartedOrExit()
     }
 
 }
-
 
 

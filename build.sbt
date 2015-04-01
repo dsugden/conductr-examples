@@ -51,7 +51,9 @@ lazy val akkaclusterFront = (project in file("akkaclusterfront"))
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
     BundleKeys.system := "AkkaConductRExamplesClusterSystem",
-    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8083, Set(URI("http:/seed"))), "spray-http" -> Endpoint("http", 8095, Set(URI("http:/test")))),
+    BundleKeys.endpoints := Map(
+      "akka-remote" -> Endpoint("tcp", 8083, Set.empty),
+      "spray-http" -> Endpoint("http", 8095, Set(URI("http:/test")))),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
     libraryDependencies ++= Dependencies.akkacluster,
     javaOptions ++= Seq(
