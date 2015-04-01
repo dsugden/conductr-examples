@@ -1,3 +1,4 @@
+import play.PlayImport._
 import sbt._
 
 object Dependencies{
@@ -44,5 +45,7 @@ object Dependencies{
     "com.typesafe.conductr"      % "akka-conductr-bundle-lib_2.11" % "0.6.1"
   )
 
+
+  lazy val playProject = Seq(ws)
 
 }
