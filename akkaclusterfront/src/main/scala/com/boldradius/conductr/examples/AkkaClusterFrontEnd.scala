@@ -20,7 +20,7 @@ import scala.util.{Failure, Success}
 
 
 /**
- * 8089
+ * This app creates an akka cluster and provides an http interface.
  */
 object AkkaClusterFrontend extends App with LazyLogging {
 
@@ -45,86 +45,38 @@ object AkkaClusterFrontend extends App with LazyLogging {
   logger.info(s"SPRAY_HTTP_BIND_IP ${sys.env.get("SPRAY_HTTP_BIND_IP")}")
   logger.info(s"SPRAY_HTTP_BIND_PORT ${sys.env.get("SPRAY_HTTP_BIND_PORT")}")
 
-
+  /**
+   * Get the Http config from conductR
+   */
   val http: (String, Int) =
     sys.env.get("SPRAY_HTTP_BIND_IP").flatMap(ip =>
       sys.env.get("SPRAY_HTTP_BIND_PORT").map(port => (ip, port.toInt))
     ). fold[(String,Int)]{
-      ("127.0.0.1", 8095)
+      ("127.0.0.1", 8095) // run locally
     }(identity)
-
 
   logger.info(s"SEED NODES ${sys.props.get("akka.cluster.seed-nodes.0")}")
 
-
-
   implicit val system = ActorSystem("AkkaConductRExamplesClusterSystem", config)
 
+  // start the frontend actor. this needs
+  val frontEndActor = system.actorOf(Props(new AkkaClusterFrontend), name = "akkaClusterFrontend")
+
   Cluster(system).registerOnMemberUp {
-    val frontEndActor = system.actorOf(Props(new AkkaClusterFrontend), name = "akkaClusterFrontend")
+
+    // start Spray http service
+    implicit val timeout = Timeout(10 seconds)
     val frontEndHttpService = system.actorOf(Props(classOf[FrontEndHttpActor], frontEndActor), "akka-cluster-http-actor")
-
-    sys.env.get("SEED_HTTP_BIND_IP").flatMap{ seedHostIp =>
-      sys.env.get("SEED_HTTP_BIND_PORT").map{ seedPort =>
-
-        logger.info("Booting up seed service")
-
-        val seedActor = system.actorOf(Props(new SeedNodesActor(seedHostIp)), name = "seed-actor")
-        val seedHttpService = system.actorOf(Props(classOf[SeedNodesHttpActor], seedActor), "seed-http-actor")
-        implicit val timeout = Timeout(5.seconds)
-        IO(Http) ? Http.Bind(seedHttpService, interface = seedHostIp, port = seedPort.toInt)
-      }
-    }
-    implicit val timeout = Timeout(5.seconds)
     IO(Http) ? Http.Bind(frontEndHttpService, interface = http._1, port = http._2)
 
+    // notify conductR
     StatusService.signalStartedOrExit()
   }
-
 }
 
-
-case object GetSeed
-class SeedNodesActor(initial:String) extends Actor{
-  def receive:Receive = {
-    case GetSeed => sender() ! initial
-  }
-}
-
-
-trait SeedNodesHttpRoute extends HttpServiceActor {
-  implicit val ec: ExecutionContext
-
-  implicit val timeout = Timeout(10 seconds)
-
-  import MarshallingSupport._
-
-  val seedActor: ActorRef
-
-  def route = {
-    get {
-      path("seeds") {
-        onComplete((seedActor ? GetSeed).mapTo[String]) {
-          case Success(r) => complete(r)
-          case Failure(t) => t.printStackTrace; complete(t.getMessage)
-        }
-      }
-    }
-  }
-}
-
-
-class SeedNodesHttpActor(sActor: ActorRef)
-  extends HttpServiceActor
-  with SeedNodesHttpRoute {
-  implicit val ec = context.dispatcher
-  override val seedActor = sActor
-  def receive = runRoute(route)
-}
-
-
-
-
+/**
+ * Spray route
+ */
 trait FrontEndHttpRoute extends HttpServiceActor {
   implicit val ec: ExecutionContext
 
@@ -137,7 +89,8 @@ trait FrontEndHttpRoute extends HttpServiceActor {
   def route = {
     get {
       path("akkacluster") {
-        onComplete((frontEndActor ? Trivial).mapTo[String]) {
+
+        onComplete((frontEndActor ? Job("akkacluster")).mapTo[String]) {
           case Success(r) => complete(r)
           case Failure(t) => t.printStackTrace; complete(t.getMessage)
         }
@@ -146,6 +99,10 @@ trait FrontEndHttpRoute extends HttpServiceActor {
   }
 }
 
+/**
+ * Actor to handle HttpRequests. Fowards to AkkaClusterFrontend
+ * @param fEndActor
+ */
 class FrontEndHttpActor(fEndActor: ActorRef)
   extends HttpServiceActor
   with FrontEndHttpRoute {
@@ -155,29 +112,32 @@ class FrontEndHttpActor(fEndActor: ActorRef)
 }
 
 
-
+/**
+ * This actor participates in the cluster, delegating Jobs from web to the
+ * backend worked actors
+ */
 class AkkaClusterFrontend() extends Actor with ActorLogging {
 
+  log.info("new AkkaClusterFrontend()")
 
   implicit val timeout = Timeout(5 seconds)
 
-  var backends = IndexedSeq.empty[ActorRef]
-  var jobCounter = 0
+  def receive = service(IndexedSeq.empty[ActorRef],0)
 
-  def receive = {
-    case Trivial if backends.isEmpty =>
+  def service(backends:IndexedSeq[ActorRef], jobCounter:Int):Receive = {
+
+    case Job(name) if backends.isEmpty =>
       sender() ! "Service unavailable, try again later"
 
-    case Trivial =>
-      jobCounter += 1
-      backends(jobCounter % backends.size) forward Trivial
+    case j@Job(name) =>
+      backends(jobCounter % backends.size) forward j
 
     case BackendRegistration if !backends.contains(sender()) =>
       log.info("backend registered, adding to backends")
       context watch sender()
-      backends = backends :+ sender()
+      context.become(service(backends :+ sender(), jobCounter))
 
     case Terminated(a) =>
-      backends = backends.filterNot(_ == a)
+      context.become(service(backends.filterNot(_ == a), jobCounter))
   }
 }

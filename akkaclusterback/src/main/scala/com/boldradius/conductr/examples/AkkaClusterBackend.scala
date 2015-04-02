@@ -73,6 +73,7 @@ class AkkaClusterBackend extends Actor with ActorLogging  {
 
     case MemberUp(member) =>
       log.info("Member is Up: {}", member.address)
+      register(member)
     case UnreachableMember(member) =>
       log.info("Member detected as unreachable: {}", member)
     case MemberRemoved(member, previousStatus) =>
@@ -80,14 +81,19 @@ class AkkaClusterBackend extends Actor with ActorLogging  {
         member.address, previousStatus)
     case _: MemberEvent => // ignore
 
-    case Trivial => sender() ! "AkkaClusterBackend success"
+    case Job(name) => sender() ! "AkkaClusterBackend success " +name
   }
 
-  def register(member: Member): Unit =
+  def register(member: Member): Unit ={
+
+    log.info(s"register:member $member" )
+
     if (member.hasRole("frontend")) {
       log.info("front end is registered, sending BackendRegistration")
       context.actorSelection(RootActorPath(member.address) / "user" / "akkaClusterFrontend") ! BackendRegistration
     }
+
+  }
 
 }
 
