@@ -50,7 +50,6 @@ object AkkaClusterFrontend extends App with LazyLogging {
     sys.env.get("SPRAY_HTTP_BIND_IP").flatMap(ip =>
       sys.env.get("SPRAY_HTTP_BIND_PORT").map(port => (ip, port.toInt))
     ). fold[(String,Int)]{
-      sys.props ++= List("akka.cluster.seed-nodes.0" -> "akka.tcp://AkkaConductRExamplesClusterSystem@127.0.0.1:8089")
       ("127.0.0.1", 8095)
     }(identity)
 
@@ -61,26 +60,26 @@ object AkkaClusterFrontend extends App with LazyLogging {
 
   implicit val system = ActorSystem("AkkaConductRExamplesClusterSystem", config)
 
+  Cluster(system).registerOnMemberUp {
+    val frontEndActor = system.actorOf(Props(new AkkaClusterFrontend), name = "akkaClusterFrontend")
+    val frontEndHttpService = system.actorOf(Props(classOf[FrontEndHttpActor], frontEndActor), "akka-cluster-http-actor")
 
-  val frontEndActor = system.actorOf(Props(new AkkaClusterFrontend), name = "akkaClusterFrontend")
-  val frontEndHttpService = system.actorOf(Props(classOf[FrontEndHttpActor], frontEndActor), "akka-cluster-http-actor")
+    sys.env.get("SEED_HTTP_BIND_IP").flatMap{ seedHostIp =>
+      sys.env.get("SEED_HTTP_BIND_PORT").map{ seedPort =>
 
+        logger.info("Booting up seed service")
 
-  sys.env.get("SEED_HTTP_BIND_IP").flatMap{ seedHostIp =>
-    sys.env.get("SEED_HTTP_BIND_PORT").map{ seedPort =>
-
-      logger.info("Booting up seed service")
-
-      val seedActor = system.actorOf(Props(new SeedNodesActor(seedHostIp)), name = "seed-actor")
-      val seedHttpService = system.actorOf(Props(classOf[SeedNodesHttpActor], seedActor), "seed-http-actor")
-      implicit val timeout = Timeout(5.seconds)
-      IO(Http) ? Http.Bind(seedHttpService, interface = seedHostIp, port = seedPort.toInt)
+        val seedActor = system.actorOf(Props(new SeedNodesActor(seedHostIp)), name = "seed-actor")
+        val seedHttpService = system.actorOf(Props(classOf[SeedNodesHttpActor], seedActor), "seed-http-actor")
+        implicit val timeout = Timeout(5.seconds)
+        IO(Http) ? Http.Bind(seedHttpService, interface = seedHostIp, port = seedPort.toInt)
+      }
     }
-  }
-  implicit val timeout = Timeout(5.seconds)
-  IO(Http) ? Http.Bind(frontEndHttpService, interface = http._1, port = http._2)
-  StatusService.signalStartedOrExit()
+    implicit val timeout = Timeout(5.seconds)
+    IO(Http) ? Http.Bind(frontEndHttpService, interface = http._1, port = http._2)
 
+    StatusService.signalStartedOrExit()
+  }
 
 }
 

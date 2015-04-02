@@ -50,15 +50,12 @@ object AkkaClusterBackend extends App with LazyLogging {
 
   logger.info(s"SEED NODES ${sys.props.get("akka.cluster.seed-nodes.0")}")
 
-
-  if( !Env.isRunByConductR ){
-    sys.props ++= List("akka.cluster.seed-nodes.0" -> "akka.tcp://AkkaConductRExamplesClusterSystem@127.0.0.1:8089")
-  }
-
   val system = ActorSystem("AkkaConductRExamplesClusterSystem", config)
 
-  system.actorOf(Props(classOf[AkkaClusterBackend]))
-
+  Cluster(system).registerOnMemberUp {
+    system.actorOf(Props(classOf[AkkaClusterBackend]))
+    StatusService.signalStartedOrExit()
+  }
 }
 
 
@@ -76,7 +73,6 @@ class AkkaClusterBackend extends Actor with ActorLogging  {
 
     case MemberUp(member) =>
       log.info("Member is Up: {}", member.address)
-      register(member)
     case UnreachableMember(member) =>
       log.info("Member detected as unreachable: {}", member)
     case MemberRemoved(member, previousStatus) =>
@@ -91,7 +87,6 @@ class AkkaClusterBackend extends Actor with ActorLogging  {
     if (member.hasRole("frontend")) {
       log.info("front end is registered, sending BackendRegistration")
       context.actorSelection(RootActorPath(member.address) / "user" / "akkaClusterFrontend") ! BackendRegistration
-      StatusService.signalStartedOrExit()
     }
 
 }
