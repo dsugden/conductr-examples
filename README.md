@@ -1,6 +1,13 @@
 Collection of projects used to demo the features of [Typesafe conductR](http://typesafe.com/products/conductr)
 
 
+##### Build a conductr cluster 
+
+1. Contact typesafe, get a copy of conductr.deb
+2. Build cluster with vagrant + ansible in project.  This vagrant uses a custom base-box... you can use this: https://github.com/dsugden/vagrant-ansible-ubuntu-oracle-java8 to create this box
+
+
+
 
 
 ##### Build the **singlemicro** bundle
