@@ -1,0 +1,16 @@
+- name: load visualizer
+  shell:
+    conduct load --ip 192.168.77.20 /usr/share/conductr/samples/visualizer-0.1.0-d248907972d1aaee6cd5bee7846a99300f0317f97ef4a6bf60f7ceb4ce4daf96.zip
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+
+
+- pause: seconds=5
+
+
+- name: run visualizer
+  shell:
+    conduct run --ip 192.168.77.20 d248907
+  environment:
+    PATH: "{{ ansible_env.HOME }}/.local/bin:{{ ansible_env.PATH }}"
+

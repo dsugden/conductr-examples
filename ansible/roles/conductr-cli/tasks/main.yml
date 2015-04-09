@@ -1,0 +1,4 @@
+- name: Install cli
+  shell:
+    pip3 install --user typesafe-conductr-cli
+

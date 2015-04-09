@@ -1,0 +1,13 @@
+- hosts: all
+  sudo: true
+  roles:
+    - conductr-seed
+    - haproxy
+    - pip
+
+- hosts: all
+  sudo: false
+  remote_user: vagrant
+  roles:
+    - conductr-cli
+    - visualizer

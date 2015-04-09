@@ -1,0 +1,29 @@
+# Update all packages to the latest version
+- apt: upgrade=dist
+  tags: [conductr-member]
+
+- name: Install conductr
+  shell:
+    dpkg -i /vagrant/conductr_1.0.0-b1_all.deb
+  tags: [conductr-member]
+
+- name: Set CONDUCTR_IP
+  shell:
+    echo -DCONDUCTR_IP={{conductr_ip}} | sudo tee -a /etc/default/conductr
+  tags: [conductr-member]
+
+- name: Set akka log level
+  shell:
+   echo -Dakka.loglevel=debug | sudo tee -a /etc/default/conductr
+
+
+- name: Set seed
+  shell:
+    echo --seed {{seed_ip}}:9004 | sudo tee -a /etc/default/conductr
+  tags: [conductr-member]
+
+
+- name: Restart ConductR
+  shell:
+    /etc/init.d/conductr restart
+  tags: [conductr-member]
