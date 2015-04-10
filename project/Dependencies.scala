@@ -13,7 +13,7 @@ object Dependencies{
   )
 
 
-  lazy val playProject = Seq(
+  lazy val playProject = common ++ Seq(
     ws,
     "com.typesafe.conductr"      % "play-conductr-bundle-lib_2.11" % "0.6.1"
   )
