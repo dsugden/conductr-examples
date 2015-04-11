@@ -7,7 +7,9 @@ Collection of projects used to demo the features of [Typesafe conductR](http://t
 2. Build cluster with vagrant + ansible in project.  This vagrant uses a custom base-box... you can use this: https://github.com/dsugden/vagrant-ansible-ubuntu-oracle-java8 to create this box
 
 
+These example projects are using [sbt-conductr](https://github.com/sbt/sbt-typesafe-conductr) 0.25.0
 
+As this plugin evolves, this repo will be updated.
 
 
 ##### Build the **singlemicro** bundle
