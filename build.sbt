@@ -10,7 +10,7 @@ version  := "1.0.0"
 lazy val scalaV = "2.11.6"
 
 lazy val singlemicro = (project in file("singlemicro"))
-  .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
+  .enablePlugins(JavaAppPackaging,ConductRPlugin)
   .settings(
     name := "singlemicro",
     version  := "1.0.0",
@@ -40,7 +40,7 @@ lazy val akkaclusterApi = (project in file("akkaclusterapi"))
 
 
 lazy val akkaclusterFront = (project in file("akkaclusterfront"))
-  .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
+  .enablePlugins(JavaAppPackaging,ConductRPlugin)
   .settings(
     name := "akkaclusterFront",
     version  := "1.0.0",
@@ -62,7 +62,7 @@ lazy val akkaclusterFront = (project in file("akkaclusterfront"))
   ).dependsOn(akkaclusterApi)
 
 lazy val akkaclusterBack = (project in file("akkaclusterback"))
-  .enablePlugins(JavaAppPackaging,SbtTypesafeConductR)
+  .enablePlugins(JavaAppPackaging,ConductRPlugin)
   .settings(
     name := "akkaclusterBack",
     version  := "1.0.0",
@@ -83,7 +83,7 @@ lazy val akkaclusterBack = (project in file("akkaclusterback"))
 
 
 lazy val playProject = (project in file("playProject"))
-  .enablePlugins(PlayScala,JavaAppPackaging,SbtTypesafeConductR)
+  .enablePlugins(PlayScala,JavaAppPackaging,ConductRPlugin)
   .settings(
     name := "playProject",
     version  := "1.0.0",

@@ -7,7 +7,7 @@ resolvers += Resolver.bintrayRepo("akka-contrib-extra", "maven")
 
 resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases"
 
-addSbtPlugin("com.typesafe.conductr" % "sbt-typesafe-conductr" % "0.28.0")
+addSbtPlugin("com.typesafe.conductr" % "sbt-conductr" % "0.28.0")
 
 // The Play plugin
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.8")
