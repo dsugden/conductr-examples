@@ -54,10 +54,8 @@ object SingleMicroservice extends App with LazyLogging{
   val ip = config.getString("singlemicro.ip")
   val port = config.getInt("singlemicro.port")
 
-
   IO(Http) ? Http.Bind(service, interface = ip, port = port)
-
-  logger.info(s"MicroserviceMain booting ip:$ip port:$port signalling in 20 seconds.")
+  logger.info(s"MicroserviceMain booting ip:$ip port:$port")
 
   StatusService.signalStartedOrExit()
 

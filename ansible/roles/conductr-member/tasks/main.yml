@@ -12,6 +12,13 @@
     echo -DCONDUCTR_IP={{conductr_ip}} | sudo tee -a /etc/default/conductr
   tags: [conductr-member]
 
+
+- name: Set akka role
+  shell:
+    echo -Dakka.cluster.roles.0={{node_akka_role}} | sudo tee -a /etc/default/conductr
+  tags: [conductr-member]
+
+
 - name: Set akka log level
   shell:
    echo -Dakka.loglevel=debug | sudo tee -a /etc/default/conductr

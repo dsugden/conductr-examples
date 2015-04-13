@@ -16,6 +16,7 @@ As this plugin evolves, this repo will be updated.
 
 
     sbt singlemicro/bundle:dist
+    
 
 
 ##### build the akkacluster bundles
@@ -27,14 +28,52 @@ The backend will join cluster, then register with front end. The frontend will f
 
     sbt
     project akkaclusterFront
+    
+    # replace with the IP of your conductr server
+    # 192.168.77.20 is for the Vagrantfile conductr custer in this repo
+    controlServer 192.168.77.20:9005
+    
     clean
     bundle:dist
-    loadBundle <Tab for bundle file >  <path to project>/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
-    startBundle <bundleId>
+    
+     
+    conduct load <Tab for bundle file >  <path to project>/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
+    conduct start <bundleId>
 
+    
+    
     project akkaclusterBack
     clean
     bundle:dist
-    loadBundle <Tab for bundle file >  <path to project>/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
-    startBundle <bundleId>
+    conduct load <Tab for bundle file >  <path to project>/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
+    conduct start <bundleId>
+    
+    
+##### ConductR roles
+
+The test ConductR network in this repo will bring up a 4 node network with the following akka.cluster.roles
+
+1. 192.168.77.20  akka.cluster.roles=[all=conductrs] 
+2. 192.168.77.22  akka.cluster.roles=[all=backend]
+3. 192.168.77.23  akka.cluster.roles=[all=frontend]
+4. 192.168.77.24  akka.cluster.roles=[all=backend]
+    
+    
+In each of the sub-projects sbt projects specification, a role is assigned for that app eg:
+
+
+    BundleKeys.roles  := Set("backend")
+    
+    
+When this app gets deployed to the ConductR cluster, it will only be replicated/ started on a node with the matching role
+    
+
+The **all-conductrs** role is the default, it will allow any role. 
+    
+    
+
+
+    
+    
+    
 

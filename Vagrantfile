@@ -21,30 +21,43 @@ Vagrant.configure(2) do |config|
   end
 
 
- config.vm.define "seed" do |seed|
-    seed.vm.network "private_network", ip: "192.168.77.20"
-    seed.vm.network "forwarded_port", guest: 9005, host: 9005
-    seed.vm.provision "ansible" do |ansible|
-      ansible.extra_vars = {
-        conductr_ip:  "192.168.77.20"
-      }
-      ansible.playbook = "ansible/seed.yml"
-      ansible.sudo = true
-      ansible.verbose = "vv"
-    end
-  end
+  config.vm.define "seed" do |seed|
+     seed.vm.network "private_network", ip: "192.168.77.20"
+     seed.vm.network "forwarded_port", guest: 9005, host: 9005
+     seed.vm.provision "ansible" do |ansible|
+       ansible.extra_vars = {
+         conductr_ip:  "192.168.77.20"
+       }
+       ansible.playbook = "ansible/seed.yml"
+       ansible.sudo = true
+       ansible.verbose = "vv"
+     end
+   end
 
 
-(1..3).each do |i|
+
+(2..4).each do |i|
      config.vm.define "member_#{i}" do |member|
         member.vm.network "private_network", ip: "192.168.77.2#{i}"
         member.vm.provision "ansible" do |ansible|
+
+
+        if #{i} % 2 == 0
           ansible.extra_vars = {
             conductr_ip:  "192.168.77.2#{i}",
-            seed_ip: "192.168.77.20"
+            seed_ip: "192.168.77.20",
+            node_akka_role: "all-conductrs"
           }
-          ansible.playbook = "ansible/member.yml"
-          ansible.sudo = true
+        else
+          ansible.extra_vars = {
+            conductr_ip:  "192.168.77.2#{i}",
+            seed_ip: "192.168.77.20",
+            node_akka_role: "all-conductrs"
+          }
+        end
+
+        ansible.playbook = "ansible/member.yml"
+        ansible.sudo = true
         end
       end
   end

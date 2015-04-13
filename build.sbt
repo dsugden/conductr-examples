@@ -15,20 +15,18 @@ lazy val singlemicro = (project in file("singlemicro"))
     name := "singlemicro",
     version  := "1.0.0",
     scalaVersion := scalaV,
-    target := file("singlemicro") / "singlemicro",
     BundleKeys.nrOfCpus := 1.0,
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
+    BundleKeys.roles  := Set("backend"),
     BundleKeys.endpoints := Map("singlemicro" -> Endpoint("http", 8096, Set(URI("http:/singlemicro")))),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
     libraryDependencies ++= Dependencies.singlemicroProject,
     javaOptions ++= Seq(
       "-Djava.library.path=" + (baseDirectory.value / "sigar").getAbsolutePath,
       "-Xms128m", "-Xmx1024m"),
-    // this enables custom javaOptions
     fork in run := true
   )
-
 
 
 lazy val akkaclusterApi = (project in file("akkaclusterapi"))
@@ -48,9 +46,10 @@ lazy val akkaclusterFront = (project in file("akkaclusterfront"))
     version  := "1.0.0",
     scalaVersion := scalaV,
     BundleKeys.nrOfCpus := 1.0,
-    BundleKeys.memory := 64.MiB ,
+    BundleKeys.memory := 1024.MiB,
     BundleKeys.diskSpace := 5.MB,
     BundleKeys.system := "AkkaConductRExamplesClusterSystem",
+    BundleKeys.roles  := Set("frontend"),
     BundleKeys.endpoints := Map(
       "akka-remote" -> Endpoint("tcp", 8083, Set.empty),
       "spray-http" -> Endpoint("http", 8095, Set(URI("http:/spray-http")))),
@@ -69,8 +68,9 @@ lazy val akkaclusterBack = (project in file("akkaclusterback"))
     version  := "1.0.0",
     scalaVersion := scalaV,
     BundleKeys.nrOfCpus := 1.0,
-    BundleKeys.memory := 64.MiB ,
+    BundleKeys.memory := 1024.MiB,
     BundleKeys.diskSpace := 5.MB,
+    BundleKeys.roles  := Set("backend"),
     BundleKeys.system := "AkkaConductRExamplesClusterSystem",
     BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8084, Set.empty)),
     resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases",
@@ -80,9 +80,6 @@ lazy val akkaclusterBack = (project in file("akkaclusterback"))
       "-Xms128m", "-Xmx1024m"),
     fork in run := true
   ).dependsOn(akkaclusterApi)
-
-
-
 
 
 lazy val playProject = (project in file("playProject"))
@@ -95,14 +92,11 @@ lazy val playProject = (project in file("playProject"))
     BundleKeys.nrOfCpus := 1.0,
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
+    BundleKeys.roles  := Set("frontend"),
     BundleKeys.endpoints := Map("playproject" -> Endpoint("http", 9000, Set(URI("http:/test")))),
     javaOptions ++= Seq("-Xms128m", "-Xmx1024m"),
     fork in run := true
   )
-
-
-
-
 
 
 fork in Test := false
