@@ -1,6 +1,8 @@
 import ByteConversions._
+import com.typesafe.conductr.sbt.ConductRKeys._
 import com.typesafe.sbt.bundle.Import.BundleKeys
 import play.PlayScala
+
 
 
 name := "conductR-examples"
