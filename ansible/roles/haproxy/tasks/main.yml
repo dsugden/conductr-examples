@@ -28,8 +28,7 @@
 
 - name: Set the ConductR IP address which is going to be used by ConductR-HAProxy to listen to bundle events in the cluster
   shell:
-    echo -Dconductr-haproxy.ip={{conductr_ip}} | sudo tee -a /etc/default/conductr-haproxy
-
+    echo -Dconductr-haproxy.ip={{conductr_ip}} | sudo tee -a /usr/share/conductr-haproxy/conf/application.ini
 
 - name: restart haproxy
   shell:

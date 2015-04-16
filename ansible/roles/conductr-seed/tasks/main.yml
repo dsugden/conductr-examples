@@ -1,15 +1,15 @@
 # Update all packages to the latest version
-- apt: upgrade=dist
+- apt: update_cache=yes
   tags: [conductr-seed]
 
 - name: Install conductr
   shell:
-    dpkg -i /vagrant/conductr_1.0.0-b1_all.deb
+    dpkg -i /vagrant/{{conductr_dist}}
   tags: [conductr-seed]
 
 - name: Set CONDUCTR_IP
   shell:
-    echo -DCONDUCTR_IP={{conductr_ip}} | sudo tee -a /etc/default/conductr
+    echo -DCONDUCTR_IP={{conductr_ip}} | sudo tee -a /usr/share/conductr/conf/application.ini
   tags: [conductr-seed]
 
 - name: Restart ConductR

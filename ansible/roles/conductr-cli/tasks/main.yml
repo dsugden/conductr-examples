@@ -2,3 +2,7 @@
   shell:
     pip3 install --user typesafe-conductr-cli
 
+- name: Set PATH
+  script:
+    clipath.sh
+  tags: [conductr-seed]

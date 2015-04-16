@@ -1,4 +1,5 @@
 - hosts: all
+  gather_facts: no
   sudo: true
   roles:
     - conductr-seed
@@ -6,6 +7,7 @@
     - pip
 
 - hosts: all
+  gather_facts: no
   sudo: false
   remote_user: vagrant
   roles:

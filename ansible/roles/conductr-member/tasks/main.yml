@@ -1,32 +1,32 @@
 # Update all packages to the latest version
-- apt: upgrade=dist
+- apt: update_cache=yes
   tags: [conductr-member]
 
 - name: Install conductr
   shell:
-    dpkg -i /vagrant/conductr_1.0.0-b1_all.deb
+    dpkg -i /vagrant/{{conductr_dist}}
   tags: [conductr-member]
 
 - name: Set CONDUCTR_IP
   shell:
-    echo -DCONDUCTR_IP={{conductr_ip}} | sudo tee -a /etc/default/conductr
+    echo -DCONDUCTR_IP={{conductr_ip}} | sudo tee -a /usr/share/conductr/conf/application.ini
   tags: [conductr-member]
 
 
 - name: Set akka role
   shell:
-    echo -Dakka.cluster.roles.0={{node_akka_role}} | sudo tee -a /etc/default/conductr
+    echo -Dakka.cluster.roles.0={{node_akka_role}} | sudo tee -a /usr/share/conductr/conf/application.ini
   tags: [conductr-member]
 
 
 - name: Set akka log level
   shell:
-   echo -Dakka.loglevel=debug | sudo tee -a /etc/default/conductr
+   echo -Dakka.loglevel=debug | sudo tee -a /usr/share/conductr/conf/application.ini
 
 
 - name: Set seed
   shell:
-    echo --seed {{seed_ip}}:9004 | sudo tee -a /etc/default/conductr
+    echo --seed {{seed_ip}}:9004 | sudo tee -a /usr/share/conductr/conf/application.ini
   tags: [conductr-member]
 
 

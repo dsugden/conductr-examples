@@ -5,7 +5,7 @@ resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/release
 
 resolvers += Resolver.bintrayRepo("akka-contrib-extra", "maven")
 
-resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases"
+//resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases"
 
 addSbtPlugin("com.typesafe.conductr" % "sbt-conductr" % "0.29.0")
 

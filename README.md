@@ -1,6 +1,9 @@
 Collection of projects used to demo the features of [Typesafe conductR](http://typesafe.com/products/conductr)
 
 
+Currently using  **conductr_1.0.0-b2a_all.deb*
+
+
 ##### Build a conductr cluster 
 
 1. Contact typesafe, get a copy of conductr.deb, add it into your clone of this repo

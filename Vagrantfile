@@ -21,12 +21,16 @@ Vagrant.configure(2) do |config|
   end
 
 
+  # This expects conductr_1.0.0-b2a_all.deb to be in this dir
+  # You can get this pckg by contacting Typesafe
+
   config.vm.define "seed" do |seed|
      seed.vm.network "private_network", ip: "192.168.77.20"
      seed.vm.network "forwarded_port", guest: 9005, host: 9005
      seed.vm.provision "ansible" do |ansible|
        ansible.extra_vars = {
-         conductr_ip:  "192.168.77.20"
+         conductr_ip:  "192.168.77.20",
+         conductr_dist: "conductr_1.0.0-b2a_all.deb"
        }
        ansible.playbook = "ansible/seed.yml"
        ansible.sudo = true
@@ -36,7 +40,7 @@ Vagrant.configure(2) do |config|
 
 
 
-(2..4).each do |i|
+  (2..3).each do |i|
      config.vm.define "member_#{i}" do |member|
         member.vm.network "private_network", ip: "192.168.77.2#{i}"
         member.vm.provision "ansible" do |ansible|
@@ -46,13 +50,15 @@ Vagrant.configure(2) do |config|
           ansible.extra_vars = {
             conductr_ip:  "192.168.77.2#{i}",
             seed_ip: "192.168.77.20",
-            node_akka_role: "all-conductrs"
+            node_akka_role: "backend",
+            conductr_dist: "conductr_1.0.0-b2a_all.deb"
           }
         else
           ansible.extra_vars = {
             conductr_ip:  "192.168.77.2#{i}",
             seed_ip: "192.168.77.20",
-            node_akka_role: "all-conductrs"
+            node_akka_role: "frontend",
+            conductr_dist: "conductr_1.0.0-b2a_all.deb"
           }
         end
 
