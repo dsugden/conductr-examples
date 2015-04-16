@@ -12,7 +12,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.synced_folder ".", "/vagrant"
   config.vm.provider "virtualbox" do |v|
-      v.memory = 2048
+      v.memory = 3072
   end
 
   if Vagrant.has_plugin?("vagrant-cachier")
@@ -33,8 +33,6 @@ Vagrant.configure(2) do |config|
          conductr_dist: "conductr_1.0.0-b2a_all.deb"
        }
        ansible.playbook = "ansible/seed.yml"
-       ansible.sudo = true
-       ansible.verbose = "vv"
      end
    end
 
@@ -45,25 +43,23 @@ Vagrant.configure(2) do |config|
         member.vm.network "private_network", ip: "192.168.77.2#{i}"
         member.vm.provision "ansible" do |ansible|
 
+            if #{i} % 2 == 0
+              ansible.extra_vars = {
+                conductr_ip:  "192.168.77.2#{i}",
+                seed_ip: "192.168.77.20",
+                node_akka_role: "backend",
+                conductr_dist: "conductr_1.0.0-b2a_all.deb"
+              }
+            else
+              ansible.extra_vars = {
+                conductr_ip:  "192.168.77.2#{i}",
+                seed_ip: "192.168.77.20",
+                node_akka_role: "frontend",
+                conductr_dist: "conductr_1.0.0-b2a_all.deb"
+              }
+            end
 
-        if #{i} % 2 == 0
-          ansible.extra_vars = {
-            conductr_ip:  "192.168.77.2#{i}",
-            seed_ip: "192.168.77.20",
-            node_akka_role: "backend",
-            conductr_dist: "conductr_1.0.0-b2a_all.deb"
-          }
-        else
-          ansible.extra_vars = {
-            conductr_ip:  "192.168.77.2#{i}",
-            seed_ip: "192.168.77.20",
-            node_akka_role: "frontend",
-            conductr_dist: "conductr_1.0.0-b2a_all.deb"
-          }
-        end
-
-        ansible.playbook = "ansible/member.yml"
-        ansible.sudo = true
+            ansible.playbook = "ansible/member.yml"
         end
       end
   end

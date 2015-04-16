@@ -1,13 +1,17 @@
 Collection of projects used to demo the features of [Typesafe conductR](http://typesafe.com/products/conductr)
 
 
-Currently using  **conductr_1.0.0-b2a_all.deb*
+Currently using  **conductr_1.0.0-b2a_all.deb** . You will need the the ConductR Package to run these examples.
+
+To get a trial: contact [Typesafe](http://typesafe.com/company/contact)
 
 
 ##### Build a conductr cluster 
 
 1. Contact typesafe, get a copy of conductr.deb, add it into your clone of this repo
-2. Build cluster with vagrant + ansible in project.  This vagrant uses a custom base-box... you can use this: https://github.com/dsugden/vagrant-ansible-ubuntu-oracle-java8 to create this box
+2. Build cluster with vagrant + ansible in project.  
+  * This vagrant uses a custom base-box... you can use this: https://github.com/dsugden/vagrant-ansible-ubuntu-oracle-java8 to create this box
+  * You can also
 
 
 These example projects are using [sbt-conductr](https://github.com/sbt/sbt-typesafe-conductr) 0.25.0

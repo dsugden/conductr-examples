@@ -1,9 +1,6 @@
 - name: Add Proxy repo
   apt_repository: repo='ppa:vbernat/haproxy-1.5'
 
-- name: Apt-get update
-  apt: update_cache=yes
-
 - name: Install haproxy
   apt: name=haproxy update_cache=yes force=yes
 
@@ -15,7 +12,6 @@
 - name: Grant HAProxy configuration file read and write access to ConductR-HAProxy application
   shell:
     chown conductr-haproxy:conductr-haproxy /etc/haproxy/haproxy.cfg
-
 
 #- name: Grant permissions for the particular command that ConductR-HAProxy is going to use by modifying the sudoers file
 #  command:
