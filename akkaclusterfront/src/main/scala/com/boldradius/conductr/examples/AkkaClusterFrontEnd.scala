@@ -5,7 +5,7 @@ import akka.io.IO
 import akka.util.Timeout
 import akka.actor.ActorRef
 import akka.cluster.Cluster
-import com.typesafe.conductr.bundlelib.akka.ClusterProperties
+import com.typesafe.conductr.bundlelib.akka.AkkaProperties
 import com.typesafe.conductr.bundlelib.scala.StatusService
 import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits._
 import com.typesafe.config.ConfigFactory
@@ -24,7 +24,7 @@ import scala.util.{Failure, Success}
  */
 object AkkaClusterFrontend extends App with LazyLogging {
 
-  ClusterProperties.initialize()
+  AkkaProperties.initialize()
 
   val config = ConfigFactory.parseString("akka.cluster.roles = [frontend]").withFallback(ConfigFactory.load())
 
@@ -59,7 +59,7 @@ object AkkaClusterFrontend extends App with LazyLogging {
 
   implicit val system = ActorSystem("AkkaConductRExamplesClusterSystem", config)
 
-  // start the frontend actor. this needs
+  // start the frontend actor
   val frontEndActor = system.actorOf(Props(new AkkaClusterFrontend), name = "akkaClusterFrontend")
 
   Cluster(system).registerOnMemberUp {

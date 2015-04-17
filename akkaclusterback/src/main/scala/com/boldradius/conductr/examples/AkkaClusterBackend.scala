@@ -6,7 +6,7 @@ import akka.actor._
 import akka.cluster.{Member, Cluster}
 import akka.cluster.ClusterEvent.{MemberRemoved, UnreachableMember, MemberEvent, MemberUp}
 import akka.io.IO
-import com.typesafe.conductr.bundlelib.akka.{LocationService, ClusterProperties}
+import com.typesafe.conductr.bundlelib.akka.{LocationService,AkkaProperties}
 import com.typesafe.conductr.bundlelib.akka.ImplicitConnectionContext
 import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits._
 import com.typesafe.conductr.bundlelib.scala.{Env, StatusService}
@@ -28,7 +28,7 @@ import scala.util.{Failure, Success}
  */
 object AkkaClusterBackend extends App with LazyLogging {
 
-  ClusterProperties.initialize()
+  AkkaProperties.initialize()
 
   val config =  ConfigFactory.parseString("akka.cluster.roles = [backend]").withFallback(ConfigFactory.load())
 

@@ -3,6 +3,7 @@
   sudo: true
   roles:
     - conductr-seed
+    - logging
     - haproxy
     - pip
 
