@@ -1,11 +1,8 @@
 logLevel := Level.Warn
 
-
 resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 
-resolvers += Resolver.bintrayRepo("akka-contrib-extra", "maven")
-
-//resolvers += "typesafe-releases" at "http://repo.typesafe.com/typesafe/maven-releases"
+resolvers += Resolver.bintrayRepo("typesafe", "maven-releases")
 
 addSbtPlugin("com.typesafe.conductr" % "sbt-conductr" % "0.33.0")
 
