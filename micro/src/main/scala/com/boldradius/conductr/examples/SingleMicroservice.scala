@@ -32,8 +32,8 @@ trait SingleMicroserviceRoute extends HttpService {
 
   def route = {
     get {
-      path("singlemicro") {
-        complete("singlemicro Success")
+      path("micro") {
+        complete("micro Success")
       }
     }
   }
@@ -51,13 +51,11 @@ object SingleMicroservice extends App with LazyLogging{
 
   val config = ConfigFactory.load()
 
-  val ip = config.getString("singlemicro.ip")
-  val port = config.getInt("singlemicro.port")
+  val ip = config.getString("micro.ip")
+  val port = config.getInt("micro.port")
 
   IO(Http) ? Http.Bind(service, interface = ip, port = port)
   logger.info(s"MicroserviceMain booting ip:$ip port:$port")
 
   StatusService.signalStartedOrExit()
-
-
 }

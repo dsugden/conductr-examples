@@ -11,18 +11,18 @@ version  := "1.0.0"
 
 lazy val scalaV = "2.11.6"
 
-lazy val singlemicro = (project in file("singlemicro"))
+lazy val micro = (project in file("micro"))
   .enablePlugins(JavaAppPackaging,ConductRPlugin)
   .settings(
-    name := "singlemicro",
+    name := "micro",
     version  := "1.0.0",
     scalaVersion := scalaV,
     BundleKeys.nrOfCpus := 1.0,
     BundleKeys.memory := 64.MiB ,
     BundleKeys.diskSpace := 5.MB,
     BundleKeys.roles  := Set("backend"),
-    BundleKeys.endpoints := Map("singlemicro" -> Endpoint("http",0,services = Set(URI("http:/singlemicro")))),
-    libraryDependencies ++= Dependencies.singlemicroProject,
+    BundleKeys.endpoints := Map("micro" -> Endpoint("http",0,services = Set(URI("http:/micro")))),
+    libraryDependencies ++= Dependencies.microProject,
     javaOptions ++= Seq(
       "-Djava.library.path=" + (baseDirectory.value / "sigar").getAbsolutePath,
       "-Xms128m", "-Xmx512m"),

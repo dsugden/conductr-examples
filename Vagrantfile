@@ -38,7 +38,7 @@ Vagrant.configure(2) do |config|
 
 
 
-  (2..3).each do |i|
+  (2..4).each do |i|
      config.vm.define "member_#{i}" do |member|
         member.vm.network "private_network", ip: "192.168.77.2#{i}"
         member.vm.provision "ansible" do |ansible|

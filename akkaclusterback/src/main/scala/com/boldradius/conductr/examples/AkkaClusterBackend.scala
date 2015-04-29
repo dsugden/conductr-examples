@@ -23,9 +23,6 @@ import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 
-/**
- * 8090
- */
 object AkkaClusterBackend extends App with LazyLogging {
 
   AkkaProperties.initialize()

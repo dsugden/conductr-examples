@@ -3,7 +3,7 @@ import sbt._
 
 object Dependencies{
 
-  lazy val singlemicroProject = common ++ akka ++ spray ++ Seq(
+  lazy val microProject = common ++ akka ++ spray ++ Seq(
     "com.typesafe.conductr"      %% "scala-conductr-bundle-lib"  % "0.7.1"
   )
 

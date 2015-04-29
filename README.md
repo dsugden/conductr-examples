@@ -19,10 +19,10 @@ These example projects are using [sbt-conductr](https://github.com/sbt/sbt-types
 As this plugin evolves, this repo will be updated.
 
 
-##### Build the **singlemicro** bundle
+##### Build the **micro** bundle
 
 
-    sbt singlemicro/bundle:dist
+    sbt micro/bundle:dist
     
 
 
@@ -45,7 +45,21 @@ The backend will join cluster, then register with front end. The frontend will f
     
      
     conduct load <Tab for bundle file >  <path to project>/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
+    
+    # you will get a message here telling you the hash (id) of the loaded bundle, you can use this hash to:
+    
     conduct run <bundleId>
+    
+    # if you want to scale this bundle to run on n nodes:
+    
+    conduct run <bundleId> n
+    
+    
+    # you will get a message here telling you the hash (id) of the bundle, you can use this hash to:
+    
+    conduct stop <bundleId>
+    
+    conduct unload <bundleId>
 
     
     
