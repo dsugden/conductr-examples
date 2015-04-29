@@ -43,7 +43,7 @@ Vagrant.configure(2) do |config|
         member.vm.network "private_network", ip: "192.168.77.2#{i}"
         member.vm.provision "ansible" do |ansible|
 
-            if #{i} % 2 == 0
+            if i % 2 == 0
               ansible.extra_vars = {
                 conductr_ip:  "192.168.77.2#{i}",
                 seed_ip: "192.168.77.20",
