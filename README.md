@@ -1,7 +1,7 @@
 Collection of projects used to demo the features of [Typesafe conductR](http://typesafe.com/products/conductr)
 
 
-Currently using  **conductr_1.0.0-b2a_all.deb** . You will need the the ConductR Package to run these examples.
+Currently using  **conductr_1.0.0-b3_all.deb** . You will need the the ConductR Package to run these examples.
 
 To get a trial: contact [Typesafe](http://typesafe.com/company/contact)
 

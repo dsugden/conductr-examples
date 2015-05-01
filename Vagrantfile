@@ -48,14 +48,14 @@ Vagrant.configure(2) do |config|
                 conductr_ip:  "192.168.77.2#{i}",
                 seed_ip: "192.168.77.20",
                 node_akka_role: "backend",
-                conductr_dist: "conductr_1.0.0-b2a_all.deb"
+                conductr_dist: "conductr_1.0.0-b3_all.deb"
               }
             else
               ansible.extra_vars = {
                 conductr_ip:  "192.168.77.2#{i}",
                 seed_ip: "192.168.77.20",
                 node_akka_role: "frontend",
-                conductr_dist: "conductr_1.0.0-b2a_all.deb"
+                conductr_dist: "conductr_1.0.0-b3_all.deb"
               }
             end
 
