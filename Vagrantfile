@@ -26,16 +26,19 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "seed" do |seed|
      seed.vm.network "private_network", ip: "192.168.77.20"
-     seed.vm.network "forwarded_port", guest: 9005, host: 9005
+#     seed.vm.network "forwarded_port", guest: 9005, host: 9005
      seed.vm.provision "ansible" do |ansible|
        ansible.extra_vars = {
          conductr_ip:  "192.168.77.20",
-         conductr_dist: "conductr_1.0.0-b2a_all.deb"
+         seed_ip: "192.168.77.20",
+         CONDUCTR_PKG: "conductr_1.0.11_all.deb",
+         CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
+         INSTALL_CLI: true,
+         HAS_ROLE: false
        }
-       ansible.playbook = "ansible/seed.yml"
+       ansible.playbook = "ansible/build-cluster-vagrant.yml"
      end
    end
-
 
 
   (2..4).each do |i|
@@ -48,19 +51,29 @@ Vagrant.configure(2) do |config|
                 conductr_ip:  "192.168.77.2#{i}",
                 seed_ip: "192.168.77.20",
                 node_akka_role: "backend",
-                conductr_dist: "conductr_1.0.0-b3_all.deb"
+                CONDUCTR_PKG: "conductr_1.0.11_all.deb",
+                CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
+                INSTALL_CLI: false,
+                HAS_ROLE: true
               }
             else
               ansible.extra_vars = {
                 conductr_ip:  "192.168.77.2#{i}",
                 seed_ip: "192.168.77.20",
                 node_akka_role: "frontend",
-                conductr_dist: "conductr_1.0.0-b3_all.deb"
+                CONDUCTR_PKG: "conductr_1.0.11_all.deb",
+                CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
+                INSTALL_CLI: false,
+                HAS_ROLE: true
               }
             end
 
-            ansible.playbook = "ansible/member.yml"
+            ansible.playbook = "ansible/build-cluster-vagrant.yml"
         end
       end
   end
+
+
+
+
 end

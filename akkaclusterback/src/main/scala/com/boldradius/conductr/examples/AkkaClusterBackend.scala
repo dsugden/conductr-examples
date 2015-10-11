@@ -6,10 +6,11 @@ import akka.actor._
 import akka.cluster.{Member, Cluster}
 import akka.cluster.ClusterEvent.{MemberRemoved, UnreachableMember, MemberEvent, MemberUp}
 import akka.io.IO
-import com.typesafe.conductr.bundlelib.akka.{LocationService,AkkaProperties}
-import com.typesafe.conductr.bundlelib.akka.ImplicitConnectionContext
-import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits._
-import com.typesafe.conductr.bundlelib.scala.{Env, StatusService}
+import com.typesafe.conductr.bundlelib.akka.{Env, ConnectionContext, StatusService}
+import com.typesafe.config.ConfigFactory
+import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits.global
+import com.typesafe.conductr.bundlelib.akka.StatusService
+import com.typesafe.conductr.bundlelib.akka.Env
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import akka.pattern.pipe
@@ -25,9 +26,8 @@ import scala.util.{Failure, Success}
 
 object AkkaClusterBackend extends App with LazyLogging {
 
-  AkkaProperties.initialize()
 
-  val config =  ConfigFactory.parseString("akka.cluster.roles = [backend]").withFallback(ConfigFactory.load())
+  val config = Env.asConfig
 
   logger.info("AkkaClusterBackend akka.remote.netty.tcp.hostname: " +config.getString("akka.remote.netty.tcp.hostname"))
   logger.info("AkkaClusterBackend akka.remote.netty.tcp.port: " +config.getString("akka.remote.netty.tcp.port"))
@@ -51,7 +51,8 @@ object AkkaClusterBackend extends App with LazyLogging {
 
   Cluster(system).registerOnMemberUp {
     system.actorOf(Props(classOf[AkkaClusterBackend]))
-    StatusService.signalStartedOrExit()
+//    implicit val cc = ConnectionContext()
+//    StatusService.signalStartedOrExit()
   }
 }
 

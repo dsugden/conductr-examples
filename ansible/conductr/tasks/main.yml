@@ -1,0 +1,52 @@
+---
+- name: Copy ConductR
+  copy: src=conductr/files/{{ CONDUCTR_PKG }} dest=/home/vagrant
+  
+- name: Install ConductR
+  apt: deb=/home/vagrant/{{ CONDUCTR_PKG }}
+
+- name: Install Conductr-Haproxy
+  apt: deb=/usr/share/conductr/extra/{{ CONDUCTR_HAPROXY_PKG }}
+
+- command: rm /home/vagrant/{{ CONDUCTR_PKG }}
+
+- name: Setup Python, Pip
+  apt: name={{ item }} state=latest
+  with_items:
+    - python3-pip
+    - python-dev
+    - python-setuptools
+  when: "{{ INSTALL_CLI }} == true"
+
+- name: Install ConductR CLI
+  command: pip3 install -U conductr-cli
+  become: yes
+  become_method: sudo
+  when: "{{ INSTALL_CLI }} == true"
+
+- name: Set akka role
+  shell:
+    echo -Dakka.cluster.roles.0={{node_akka_role}} | sudo tee -a /usr/share/conductr/conf/application.ini
+  become: yes
+  become_method: sudo
+  when: "{{ HAS_ROLE }} == true"
+
+- name: Set CONDUCTR IP
+  shell:
+    echo -Dconductr.ip={{conductr_ip}} | sudo tee -a /usr/share/conductr/conf/application.ini
+  become: yes
+  become_method: sudo
+
+
+- name: Set seed
+  shell:
+    echo --seed {{seed_ip}}:9004 | sudo tee -a /usr/share/conductr/conf/application.ini
+  become: yes
+  become_method: sudo
+
+
+
+#- shell: 'echo -Dconductr.ip=$(hostname -i)| sudo tee -a /usr/share/conductr/conf/application.ini'
+#  become: yes
+#  become_method: sudo
+

@@ -5,10 +5,9 @@ import akka.io.IO
 import akka.util.Timeout
 import akka.actor.ActorRef
 import akka.cluster.Cluster
-import com.typesafe.conductr.bundlelib.akka.AkkaProperties
-import com.typesafe.conductr.bundlelib.scala.StatusService
-import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits._
+import com.typesafe.conductr.bundlelib.akka.{ConnectionContext, StatusService, Env}
 import com.typesafe.config.ConfigFactory
+import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits.global
 import com.typesafe.scalalogging.LazyLogging
 import spray.can.Http
 import spray.routing.HttpServiceActor
@@ -24,9 +23,10 @@ import scala.util.{Failure, Success}
  */
 object AkkaClusterFrontend extends App with LazyLogging {
 
-  AkkaProperties.initialize()
+  val config = Env.asConfig
+  val systemName = sys.env.getOrElse("BUNDLE_SYSTEM", "MyApp1")
 
-  val config = ConfigFactory.parseString("akka.cluster.roles = [frontend]").withFallback(ConfigFactory.load())
+//  val config = ConfigFactory.parseString("akka.cluster.roles = [frontend]").withFallback(ConfigFactory.load())
 
   logger.info("AkkaClusterFrontend akka.remote.netty.tcp.hostname: " + config.getString("akka.remote.netty.tcp.hostname"))
   logger.info("AkkaClusterFrontend akka.remote.netty.tcp.port: " + config.getString("akka.remote.netty.tcp.port"))
@@ -70,6 +70,7 @@ object AkkaClusterFrontend extends App with LazyLogging {
     IO(Http) ? Http.Bind(frontEndHttpService, interface = http._1, port = http._2)
 
     // notify conductR
+    implicit val cc = ConnectionContext()
     StatusService.signalStartedOrExit()
   }
 }

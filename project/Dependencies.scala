@@ -4,23 +4,23 @@ import sbt._
 object Dependencies{
 
   lazy val microProject = common ++ akka ++ spray ++ Seq(
-    "com.typesafe.conductr"      %% "scala-conductr-bundle-lib"  % "0.7.1"
+    "com.typesafe.conductr"      %% "scala-conductr-bundle-lib"  % "1.0.1"
   )
 
 
   lazy val akkaclusterProject =   common ++ akka ++ akkacluster ++ spray ++ Seq(
-    "com.typesafe.conductr"      % "akka-conductr-bundle-lib_2.11" % "0.7.1"
+    "com.typesafe.conductr"     %% "akka23-conductr-bundle-lib" % "1.0.1"
   )
 
 
   lazy val playProject = common ++ Seq(
     ws,
-    "com.typesafe.conductr"      % "play-conductr-bundle-lib_2.11" % "0.7.1"
+    "com.typesafe.conductr" %% "play23-conductr-bundle-lib" % "1.0.1"
   )
 
 
 
-  lazy val AkkaV  = "2.3.6"
+  lazy val AkkaV  = "2.3.14"
   lazy val SprayV = "1.3.3"
 
 

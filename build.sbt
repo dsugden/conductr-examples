@@ -1,5 +1,4 @@
 import ByteConversions._
-import com.typesafe.conductr.sbt.ConductRKeys._
 import com.typesafe.sbt.bundle.Import.BundleKeys
 import play.PlayScala
 
@@ -9,7 +8,7 @@ name := "conductR-examples"
 
 version  := "1.0.0"
 
-lazy val scalaV = "2.11.6"
+lazy val scalaV = "2.11.7"
 
 lazy val micro = (project in file("micro"))
   .enablePlugins(JavaAppPackaging,ConductRPlugin)

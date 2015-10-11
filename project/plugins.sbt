@@ -4,7 +4,7 @@ resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/release
 
 resolvers += Resolver.bintrayRepo("typesafe", "maven-releases")
 
-addSbtPlugin("com.typesafe.conductr" % "sbt-conductr" % "0.33.0")
+addSbtPlugin("com.typesafe.conductr" % "sbt-conductr" % "1.1.1")
 
 // The Play plugin
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.8")
