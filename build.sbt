@@ -51,7 +51,7 @@ lazy val akkaclusterFront = (project in file("akkaclusterfront"))
     BundleKeys.system := "AkkaConductRExamplesClusterSystem",
     BundleKeys.roles  := Set("frontend"),
     BundleKeys.endpoints := Map(
-      "akka-remote" -> Endpoint("tcp", 8083, Set.empty),
+      "akka-remote" -> Endpoint("tcp"),
       "spray-http" -> Endpoint("http", 8095, Set(URI("http:/spray-http")))),
     libraryDependencies ++= Dependencies.akkaclusterProject,
     javaOptions ++= Seq(
@@ -71,7 +71,7 @@ lazy val akkaclusterBack = (project in file("akkaclusterback"))
     BundleKeys.diskSpace := 5.MB,
     BundleKeys.roles  := Set("backend"),
     BundleKeys.system := "AkkaConductRExamplesClusterSystem",
-    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp", 8084, Set.empty)),
+    BundleKeys.endpoints := Map("akka-remote" -> Endpoint("tcp")),
     libraryDependencies ++= Dependencies.akkaclusterProject,
     javaOptions ++= Seq(
       "-Djava.library.path=" + (baseDirectory.value / "sigar").getAbsolutePath,
