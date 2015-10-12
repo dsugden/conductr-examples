@@ -10,5 +10,5 @@
 
 - name: run visualizer
   shell:
-    conduct run --ip 192.168.77.20 vis
+    conduct run --ip 192.168.77.20 visualizer
 

@@ -24,7 +24,6 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "seed" do |seed|
      seed.vm.network "private_network", ip: "192.168.77.20"
-     seed.vm.network "forwarded_port", guest: 9005, host: 9005
      seed.vm.provision "ansible" do |ansible|
        ansible.extra_vars = {
          conductr_ip:  "192.168.77.20",
@@ -32,10 +31,10 @@ Vagrant.configure(2) do |config|
          CONDUCTR_PKG: "conductr_1.0.11_all.deb",
          CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
          INSTALL_CLI: true,
-         HAS_ROLE: false,
-         verbose: 'vvv'
+         node_akka_role: "web-server"
        }
        ansible.playbook = "ansible/build-cluster-vagrant-seed.yml"
+       ansible.verbose = "vvv"
      end
    end
 
@@ -52,9 +51,7 @@ Vagrant.configure(2) do |config|
                 node_akka_role: "backend",
                 CONDUCTR_PKG: "conductr_1.0.11_all.deb",
                 CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
-                INSTALL_CLI: false,
-                HAS_ROLE: true,
-                verbose: 'vvv'
+                INSTALL_CLI: false
               }
             else
               ansible.extra_vars = {
@@ -63,13 +60,12 @@ Vagrant.configure(2) do |config|
                 node_akka_role: "frontend",
                 CONDUCTR_PKG: "conductr_1.0.11_all.deb",
                 CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
-                INSTALL_CLI: false,
-                HAS_ROLE: true,
-                verbose: 'vvv'
+                INSTALL_CLI: false
               }
             end
+              ansible.playbook = "ansible/build-cluster-vagrant.yml"
+              ansible.verbose = "vvv"
 
-            ansible.playbook = "ansible/build-cluster-vagrant.yml"
         end
       end
   end

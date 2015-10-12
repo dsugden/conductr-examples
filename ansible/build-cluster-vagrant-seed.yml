@@ -8,5 +8,5 @@
   tasks:
     #- include: java/tasks/main.yml
     - include: haproxy/tasks/main.yml
-    - include: conductr/tasks/main.yml
+    - { include: conductr/tasks/main.yml, IS_SEED: true }
     - include: visualizer/tasks/main.yml

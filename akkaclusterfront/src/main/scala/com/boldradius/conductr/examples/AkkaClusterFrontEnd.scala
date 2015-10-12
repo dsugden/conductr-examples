@@ -36,17 +36,17 @@ object AkkaClusterFrontend extends App with LazyLogging {
   logger.info("AkkaClusterFrontend akka.cluster.seed-nodes: " + config.getList("akka.cluster.seed-nodes"))
 
 
-//  logger.info(s"AKKA_REMOTE_HOST ${sys.env.get("AKKA_REMOTE_HOST")}")
-//
-//  logger.info(s"bundleHostIp ${sys.env.get("BUNDLE_HOST_IP")}")
-//  logger.info(s"bundleSystem ${sys.env.get("BUNDLE_SYSTEM")}")
-//  logger.info(s"akkaRemoteHostProtocol ${sys.env.get("AKKA_REMOTE_HOST_PROTOCOL")}")
-//  logger.info(s"akkaRemoteHostPort ${sys.env.get("AKKA_REMOTE_HOST_PORT")}")
-//  logger.info(s"akkaRemoteOtherProtocolsConcat ${sys.env.get("AKKA_REMOTE_OTHER_PROTOCOLS")}")
-//  logger.info(s"akkaRemoteOtherIpsConcat ${sys.env.get("AKKA_REMOTE_OTHER_IPS")}")
-//  logger.info(s"akkaRemoteOtherPortsConcat ${sys.env.get("AKKA_REMOTE_OTHER_PORTS")}")
-//  logger.info(s"SPRAY_HTTP_BIND_IP ${sys.env.get("SPRAY_HTTP_BIND_IP")}")
-//  logger.info(s"SPRAY_HTTP_BIND_PORT ${sys.env.get("SPRAY_HTTP_BIND_PORT")}")
+  logger.info(s"AKKA_REMOTE_HOST ${sys.env.get("AKKA_REMOTE_HOST")}")
+
+  logger.info(s"bundleHostIp ${sys.env.get("BUNDLE_HOST_IP")}")
+  logger.info(s"bundleSystem ${sys.env.get("BUNDLE_SYSTEM")}")
+  logger.info(s"akkaRemoteHostProtocol ${sys.env.get("AKKA_REMOTE_HOST_PROTOCOL")}")
+  logger.info(s"akkaRemoteHostPort ${sys.env.get("AKKA_REMOTE_HOST_PORT")}")
+  logger.info(s"akkaRemoteOtherProtocolsConcat ${sys.env.get("AKKA_REMOTE_OTHER_PROTOCOLS")}")
+  logger.info(s"akkaRemoteOtherIpsConcat ${sys.env.get("AKKA_REMOTE_OTHER_IPS")}")
+  logger.info(s"akkaRemoteOtherPortsConcat ${sys.env.get("AKKA_REMOTE_OTHER_PORTS")}")
+  logger.info(s"SPRAY_HTTP_BIND_IP ${sys.env.get("SPRAY_HTTP_BIND_IP")}")
+  logger.info(s"SPRAY_HTTP_BIND_PORT ${sys.env.get("SPRAY_HTTP_BIND_PORT")}")
 
   /**
    * Get the Http config from conductR

@@ -25,14 +25,15 @@
   when: "{{ INSTALL_CLI }} == true"
 
 
-- shell: 'echo -DCONDUCTR_IP={{ conductr_ip }} | sudo tee -a /usr/share/conductr/conf/application.ini'
+- shell: 'echo -Dconductr.ip={{ conductr_ip }} | sudo tee -a /usr/share/conductr/conf/application.ini'
   become: yes
   become_method: sudo
 
 
-#- name: Set akka log level
-#  shell:
-#   echo -Dakka.loglevel=DEBUG | sudo tee -a /usr/share/conductr/conf/application.ini
+- shell: 'echo export CONDUCTR_IP=$(hostname -i) | sudo tee -a /etc/profile'
+  become: yes
+  become_method: sudo
+
 
 - shell: 'echo -Dconductr-haproxy.ip={{ conductr_ip }} | sudo tee -a /usr/share/conductr-haproxy/conf/application.ini'
   become: yes
@@ -61,7 +62,6 @@
     echo -Dakka.cluster.roles.0={{node_akka_role}} | sudo tee -a /usr/share/conductr/conf/application.ini
   become: yes
   become_method: sudo
-  when: "{{ HAS_ROLE }} == true"
 
 
 - name: Set seed
@@ -69,6 +69,7 @@
     echo --seed {{seed_ip}}:9004 | sudo tee -a /usr/share/conductr/conf/application.ini
   become: yes
   become_method: sudo
+  when: "{{ IS_SEED }} == false"
 
 
 
