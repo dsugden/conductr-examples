@@ -28,6 +28,7 @@ object AkkaClusterBackend extends App with LazyLogging {
 
 
   val config = Env.asConfig
+  val systemName = sys.env.getOrElse("BUNDLE_SYSTEM", "AkkaConductRExamplesClusterSystem")
 
   logger.info("AkkaClusterBackend akka.remote.netty.tcp.hostname: " +config.getString("akka.remote.netty.tcp.hostname"))
   logger.info("AkkaClusterBackend akka.remote.netty.tcp.port: " +config.getString("akka.remote.netty.tcp.port"))
@@ -47,10 +48,14 @@ object AkkaClusterBackend extends App with LazyLogging {
 
   logger.info(s"SEED NODES ${sys.props.get("akka.cluster.seed-nodes.0")}")
 
-  val system = ActorSystem("AkkaConductRExamplesClusterSystem", config)
+  //  val config = ConfigFactory.parseString("akka.cluster.roles = [frontend]").withFallback(ConfigFactory.load())
+
+  val system = ActorSystem(systemName, config.withFallback(ConfigFactory.load()))
 
   Cluster(system).registerOnMemberUp {
     system.actorOf(Props(classOf[AkkaClusterBackend]))
+
+    logger.info("***********************  registerOnMemberUp ")
     StatusService.signalStartedOrExit()
   }
 }

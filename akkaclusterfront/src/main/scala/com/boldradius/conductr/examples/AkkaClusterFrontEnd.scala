@@ -25,7 +25,9 @@ import scala.util.{Failure, Success}
 object AkkaClusterFrontend extends App with LazyLogging {
 
   val config = Env.asConfig
-  val systemName = sys.env.getOrElse("BUNDLE_SYSTEM", "MyApp1")
+  val systemName = sys.env.getOrElse("BUNDLE_SYSTEM", "AkkaConductRExamplesClusterSystem")
+
+  logger.info("systemName: " + systemName)
 
 //  val config = ConfigFactory.parseString("akka.cluster.roles = [frontend]").withFallback(ConfigFactory.load())
 
@@ -58,7 +60,7 @@ object AkkaClusterFrontend extends App with LazyLogging {
 
   logger.info(s"SEED NODES ${sys.props.get("akka.cluster.seed-nodes.0")}")
 
-  implicit val system = ActorSystem("AkkaConductRExamplesClusterSystem", config)
+  implicit val system = ActorSystem(systemName, config.withFallback(ConfigFactory.load()))
 
   // start the frontend actor
   val frontEndActor = system.actorOf(Props(new AkkaClusterFrontend), name = "akkaClusterFrontend")
@@ -69,6 +71,9 @@ object AkkaClusterFrontend extends App with LazyLogging {
     implicit val timeout = Timeout(10 seconds)
     val frontEndHttpService = system.actorOf(Props(classOf[FrontEndHttpActor], frontEndActor), "akka-cluster-http-actor")
     IO(Http) ? Http.Bind(frontEndHttpService, interface = http._1, port = http._2)
+
+
+    logger.info("registerOnMemberUp ")
 
     // notify conductR
 //    implicit val cc = ConnectionContext()
@@ -118,9 +123,9 @@ class FrontEndHttpActor(fEndActor: ActorRef)
  * This actor participates in the cluster, delegating Jobs from web to the
  * backend worked actors
  */
-class AkkaClusterFrontend() extends Actor with ActorLogging {
+class AkkaClusterFrontend() extends Actor with LazyLogging {
 
-  log.info("new AkkaClusterFrontend()")
+  logger.info("new AkkaClusterFrontend()")
 
   implicit val timeout = Timeout(5 seconds)
 
@@ -135,7 +140,7 @@ class AkkaClusterFrontend() extends Actor with ActorLogging {
       backends(jobCounter % backends.size) forward j
 
     case BackendRegistration if !backends.contains(sender()) =>
-      log.info("backend registered, adding to backends")
+      logger.info("backend registered, adding to backends")
       context watch sender()
       context.become(service(backends :+ sender(), jobCounter))
 
