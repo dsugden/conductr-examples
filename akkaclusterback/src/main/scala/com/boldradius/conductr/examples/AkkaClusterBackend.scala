@@ -6,10 +6,10 @@ import akka.actor._
 import akka.cluster.{Member, Cluster}
 import akka.cluster.ClusterEvent.{MemberRemoved, UnreachableMember, MemberEvent, MemberUp}
 import akka.io.IO
-import com.typesafe.conductr.bundlelib.akka.{Env, ConnectionContext, StatusService}
+//import com.typesafe.conductr.bundlelib.akka.{Env, ConnectionContext}
 import com.typesafe.config.ConfigFactory
 import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits.global
-import com.typesafe.conductr.bundlelib.akka.StatusService
+import com.typesafe.conductr.bundlelib.scala.StatusService
 import com.typesafe.conductr.bundlelib.akka.Env
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
@@ -51,8 +51,7 @@ object AkkaClusterBackend extends App with LazyLogging {
 
   Cluster(system).registerOnMemberUp {
     system.actorOf(Props(classOf[AkkaClusterBackend]))
-//    implicit val cc = ConnectionContext()
-//    StatusService.signalStartedOrExit()
+    StatusService.signalStartedOrExit()
   }
 }
 

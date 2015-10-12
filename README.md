@@ -13,7 +13,11 @@ To get a trial: contact [Typesafe](http://typesafe.com/company/contact)
 1. Contact typesafe, get a copy of conductr.deb, add it into your clone of this repo
 2. Build cluster with vagrant + ansible in project.  
   * This vagrant uses a custom base-box... you can use this: https://github.com/dsugden/vagrant-ansible-ubuntu-oracle-java8 to create this box
-  * You can also
+  * OR use trusty64 box and uncomment the java task in build-cluster-vagrant.yml's
+3. Launch visualizer
+
+    http://192.168.77.20:9999/
+
 
 
 These example projects are using [sbt-conductr](https://github.com/sbt/sbt-typesafe-conductr) 0.33.0

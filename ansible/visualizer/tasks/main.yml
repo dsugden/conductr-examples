@@ -1,0 +1,14 @@
+- pause: seconds=10
+
+- name: load visualizer
+  shell:
+    conduct load --ip 192.168.77.20 /usr/share/conductr/samples/visualizer*
+
+
+- pause: seconds=5
+
+
+- name: run visualizer
+  shell:
+    conduct run --ip 192.168.77.20 vis
+

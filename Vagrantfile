@@ -21,12 +21,10 @@ Vagrant.configure(2) do |config|
   end
 
 
-  # This expects conductr_1.0.0-b2a_all.deb to be in this dir
-  # You can get this pckg by contacting Typesafe
 
   config.vm.define "seed" do |seed|
      seed.vm.network "private_network", ip: "192.168.77.20"
-#     seed.vm.network "forwarded_port", guest: 9005, host: 9005
+     seed.vm.network "forwarded_port", guest: 9005, host: 9005
      seed.vm.provision "ansible" do |ansible|
        ansible.extra_vars = {
          conductr_ip:  "192.168.77.20",
@@ -34,9 +32,10 @@ Vagrant.configure(2) do |config|
          CONDUCTR_PKG: "conductr_1.0.11_all.deb",
          CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
          INSTALL_CLI: true,
-         HAS_ROLE: false
+         HAS_ROLE: false,
+         verbose: 'vvv'
        }
-       ansible.playbook = "ansible/build-cluster-vagrant.yml"
+       ansible.playbook = "ansible/build-cluster-vagrant-seed.yml"
      end
    end
 
@@ -54,7 +53,8 @@ Vagrant.configure(2) do |config|
                 CONDUCTR_PKG: "conductr_1.0.11_all.deb",
                 CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
                 INSTALL_CLI: false,
-                HAS_ROLE: true
+                HAS_ROLE: true,
+                verbose: 'vvv'
               }
             else
               ansible.extra_vars = {
@@ -64,7 +64,8 @@ Vagrant.configure(2) do |config|
                 CONDUCTR_PKG: "conductr_1.0.11_all.deb",
                 CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
                 INSTALL_CLI: false,
-                HAS_ROLE: true
+                HAS_ROLE: true,
+                verbose: 'vvv'
               }
             end
 

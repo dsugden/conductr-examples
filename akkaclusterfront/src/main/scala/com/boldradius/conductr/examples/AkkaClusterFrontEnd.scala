@@ -5,7 +5,8 @@ import akka.io.IO
 import akka.util.Timeout
 import akka.actor.ActorRef
 import akka.cluster.Cluster
-import com.typesafe.conductr.bundlelib.akka.{ConnectionContext, StatusService, Env}
+import com.typesafe.conductr.bundlelib.akka.Env
+import com.typesafe.conductr.bundlelib.scala.StatusService
 import com.typesafe.config.ConfigFactory
 import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits.global
 import com.typesafe.scalalogging.LazyLogging
@@ -70,7 +71,7 @@ object AkkaClusterFrontend extends App with LazyLogging {
     IO(Http) ? Http.Bind(frontEndHttpService, interface = http._1, port = http._2)
 
     // notify conductR
-    implicit val cc = ConnectionContext()
+//    implicit val cc = ConnectionContext()
     StatusService.signalStartedOrExit()
   }
 }

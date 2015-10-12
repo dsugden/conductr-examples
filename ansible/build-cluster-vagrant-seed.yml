@@ -1,0 +1,12 @@
+--- 
+- name: Setup ConductR
+  hosts: all
+  remote_user: vagrant
+  gather_facts: True
+  sudo: True
+
+  tasks:
+    #- include: java/tasks/main.yml
+    - include: haproxy/tasks/main.yml
+    - include: conductr/tasks/main.yml
+    - include: visualizer/tasks/main.yml
