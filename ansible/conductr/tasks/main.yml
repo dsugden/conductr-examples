@@ -30,6 +30,11 @@
   become_method: sudo
 
 
+- shell: 'echo -DCONDUCTR_IP={{ conductr_ip }} | sudo tee -a /usr/share/conductr/conf/application.ini'
+  become: yes
+  become_method: sudo
+
+
 - shell: 'echo export CONDUCTR_IP=$(hostname -i) | sudo tee -a /etc/profile'
   become: yes
   become_method: sudo
