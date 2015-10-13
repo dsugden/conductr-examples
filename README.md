@@ -80,10 +80,10 @@ The backend will join cluster, then register with front end. The frontend will f
 
 The test ConductR network in this repo will bring up a 4 node network with the following akka.cluster.roles
 
-1. 192.168.77.20  akka.cluster.roles=[all=conductrs] 
-2. 192.168.77.22  akka.cluster.roles=[all=backend]
-3. 192.168.77.23  akka.cluster.roles=[all=frontend]
-4. 192.168.77.24  akka.cluster.roles=[all=backend]
+1. 192.168.77.20  akka.cluster.roles=[web-server] 
+2. 192.168.77.22  akka.cluster.roles=[backend]
+3. 192.168.77.23  akka.cluster.roles=[frontend]
+4. 192.168.77.24  akka.cluster.roles=[backend]
     
     
 In each of the sub-projects sbt projects specification, a role is assigned for that app eg:
