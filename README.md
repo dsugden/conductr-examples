@@ -58,7 +58,7 @@ The backend will join cluster, then register with front end. The frontend will f
     
     # if you want to scale this bundle to run on n nodes:
     
-    conduct run <bundleId> n
+    conduct run <bundleId> --scale <n>
     
     
     # you will get a message here telling you the hash (id) of the bundle, you can use this hash to:
