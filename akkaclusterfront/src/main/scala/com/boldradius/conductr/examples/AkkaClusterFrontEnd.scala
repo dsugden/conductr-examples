@@ -1,6 +1,7 @@
 package com.boldradius.conductr.examples
 
 import akka.actor._
+import akka.cluster.ClusterEvent.MemberEvent
 import akka.io.IO
 import akka.util.Timeout
 import akka.actor.ActorRef
@@ -36,7 +37,7 @@ object AkkaClusterFrontend extends App with LazyLogging {
   logger.info("AkkaClusterFrontend akka.cluster.seed-nodes: " + config.getList("akka.cluster.seed-nodes"))
 
 
-  logger.info(s"AKKA_REMOTE_HOST ${sys.env.get("AKKA_REMOTE_HOST")}")
+  logger.info(s"AkkaClusterFrontend AKKA_REMOTE_HOST ${sys.env.get("AKKA_REMOTE_HOST")}")
 
   logger.info(s"bundleHostIp ${sys.env.get("BUNDLE_HOST_IP")}")
   logger.info(s"bundleSystem ${sys.env.get("BUNDLE_SYSTEM")}")
@@ -73,7 +74,7 @@ object AkkaClusterFrontend extends App with LazyLogging {
     IO(Http) ? Http.Bind(frontEndHttpService, interface = http._1, port = http._2)
 
 
-    logger.info("registerOnMemberUp ")
+    logger.info("AkkaClusterFrontend registerOnMemberUp ")
 
     // notify conductR
     implicit val cc = ConnectionContext()
@@ -129,6 +130,13 @@ class AkkaClusterFrontend() extends Actor with LazyLogging {
 
   implicit val timeout = Timeout(5 seconds)
 
+
+  val cluster = Cluster(context.system)
+
+  override def preStart(): Unit = cluster.subscribe(self, classOf[MemberEvent])
+  override def postStop(): Unit = cluster.unsubscribe(self)
+
+
   def receive = service(IndexedSeq.empty[ActorRef],0)
 
   def service(backends:IndexedSeq[ActorRef], jobCounter:Int):Receive = {
@@ -145,6 +153,7 @@ class AkkaClusterFrontend() extends Actor with LazyLogging {
       context.become(service(backends :+ sender(), jobCounter))
 
     case Terminated(a) =>
+      logger.info("AkkaClusterFrontend Terminated " + a )
       context.become(service(backends.filterNot(_ == a), jobCounter))
   }
 }

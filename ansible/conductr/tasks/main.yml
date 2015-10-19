@@ -52,11 +52,38 @@
   become: yes
   become_method: sudo
 
+- shell: 'echo -Dcontrail.syslog.server.host=127.0.0.1 | sudo tee -a /usr/share/conductr/conf/application.ini'
+  become: yes
+  become_method: sudo
+
+
+- shell: 'echo -Dcontrail.syslog.server.port=9200 | sudo tee -a /usr/share/conductr/conf/application.ini'
+  become: yes
+  become_method: sudo
+
+- shell: 'echo -Dcontrail.syslog.server.elasticsearch.enabled=on | sudo tee -a /usr/share/conductr/conf/application.ini'
+  become: yes
+  become_method: sudo
+
 - shell: "echo '$ModLoad imtcp' | sudo tee -a /etc/rsyslog.d/conductr.conf"
   become: yes
   become_method: sudo
 
 - shell: "echo '$InputTCPServerRun 514' | sudo tee -a /etc/rsyslog.d/conductr.conf"
+  become: yes
+  become_method: sudo
+
+
+- shell: "sudo mkdir -p /var/lib/elasticsearch /var/log/elasticsearch"
+  become: yes
+  become_method: sudo
+
+- shell: "sudo chown conductr:conductr /var/lib/elasticsearch"
+  become: yes
+  become_method: sudo
+
+
+- shell: "sudo chown conductr:conductr /var/log/elasticsearch"
   become: yes
   become_method: sudo
 
@@ -67,6 +94,23 @@
     echo -Dakka.cluster.roles.0={{node_akka_role}} | sudo tee -a /usr/share/conductr/conf/application.ini
   become: yes
   become_method: sudo
+
+
+- name: Set elastic search role
+  shell:
+    echo -Dakka.cluster.roles.1=elasticsearch | sudo tee -a /usr/share/conductr/conf/application.ini
+  become: yes
+  become_method: sudo
+  when: "{{ INSTALL_ELASTIC_SEARCH }} == true"
+
+
+- name: Set kibana role
+  shell:
+    echo -Dakka.cluster.roles.2=kibana | sudo tee -a /usr/share/conductr/conf/application.ini
+  become: yes
+  become_method: sudo
+  when: "{{ INSTALL_KIBANA }} == true"
+
 
 
 - name: Set seed
