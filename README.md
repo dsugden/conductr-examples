@@ -50,7 +50,7 @@ The backend will join cluster, then register with front end. The frontend will f
     bundle:dist
     
      
-    conduct load <Tab for bundle file >  <path to project>/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
+    conduct load <Tab for bundle file > 
     
     # you will get a message here telling you the hash (id) of the loaded bundle, you can use this hash to:
     
@@ -58,7 +58,7 @@ The backend will join cluster, then register with front end. The frontend will f
     
     # if you want to scale this bundle to run on n nodes:
     
-    conduct run <bundleId> n
+    conduct run <bundleId> --scale <n>
     
     
     # you will get a message here telling you the hash (id) of the bundle, you can use this hash to:
@@ -72,7 +72,7 @@ The backend will join cluster, then register with front end. The frontend will f
     project akkaclusterBack
     clean
     bundle:dist
-    conduct load <Tab for bundle file >  <path to project>/init-cluster.sh-a802635856ee251147550871a5f88b46e7f25b7f72cd276942c8bbd2622023bc.zip
+    conduct load <Tab for bundle file >
     conduct run <bundleId>
     
     
@@ -80,10 +80,10 @@ The backend will join cluster, then register with front end. The frontend will f
 
 The test ConductR network in this repo will bring up a 4 node network with the following akka.cluster.roles
 
-1. 192.168.77.20  akka.cluster.roles=[all=conductrs] 
-2. 192.168.77.22  akka.cluster.roles=[all=backend]
-3. 192.168.77.23  akka.cluster.roles=[all=frontend]
-4. 192.168.77.24  akka.cluster.roles=[all=backend]
+1. 192.168.77.20  akka.cluster.roles=[web-server] 
+2. 192.168.77.22  akka.cluster.roles=[backend]
+3. 192.168.77.23  akka.cluster.roles=[frontend]
+4. 192.168.77.24  akka.cluster.roles=[backend]
     
     
 In each of the sub-projects sbt projects specification, a role is assigned for that app eg:
