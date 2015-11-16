@@ -30,8 +30,6 @@ object AkkaClusterFrontend extends App with LazyLogging {
 
   logger.info("systemName: " + systemName)
 
-//  val config = ConfigFactory.parseString("akka.cluster.roles = [frontend]").withFallback(ConfigFactory.load())
-
   logger.info("AkkaClusterFrontend akka.remote.netty.tcp.hostname: " + config.getString("akka.remote.netty.tcp.hostname"))
   logger.info("AkkaClusterFrontend akka.remote.netty.tcp.port: " + config.getString("akka.remote.netty.tcp.port"))
   logger.info("AkkaClusterFrontend akka.cluster.seed-nodes: " + config.getList("akka.cluster.seed-nodes"))
