@@ -20,7 +20,7 @@ To get a trial: contact [Typesafe](http://typesafe.com/company/contact)
 
 
 
-These example projects are using [sbt-conductr](https://github.com/sbt/sbt-typesafe-conductr) 0.33.0
+These example projects are using [sbt-conductr](https://github.com/sbt/sbt-typesafe-conductr) 1.2.1
 
 As this plugin evolves, this repo will be updated.
 
