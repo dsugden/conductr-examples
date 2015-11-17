@@ -4,7 +4,7 @@ import java.net.URL
 
 import akka.actor._
 import akka.cluster.{Member, Cluster}
-import akka.cluster.ClusterEvent.{MemberRemoved, UnreachableMember, MemberEvent, MemberUp}
+import akka.cluster.ClusterEvent._
 import akka.io.IO
 import com.typesafe.conductr.bundlelib.akka.{ConnectionContext, StatusService, Env}
 //import com.typesafe.conductr.bundlelib.akka.{Env, ConnectionContext}
@@ -27,7 +27,7 @@ import scala.util.{Failure, Success}
 object AkkaClusterBackend extends App with LazyLogging {
 
 
-  val config = Env.asConfig
+  val config = Env.asConfig.withFallback(ConfigFactory.load())
   val systemName = sys.env.getOrElse("BUNDLE_SYSTEM", "AkkaConductRExamplesClusterSystem")
 
   logger.info("AkkaClusterBackend akka.remote.netty.tcp.hostname: " +config.getString("akka.remote.netty.tcp.hostname"))
@@ -63,36 +63,45 @@ object AkkaClusterBackend extends App with LazyLogging {
 
 
 
-class AkkaClusterBackend extends Actor with LazyLogging  {
+class AkkaClusterBackend extends Actor with ActorLogging  {
 
   val cluster = Cluster(context.system)
 
-  override def preStart(): Unit = cluster.subscribe(self, classOf[MemberEvent])
+  override def preStart(): Unit = cluster.subscribe(self,
+    initialStateMode = InitialStateAsEvents,
+    classOf[MemberUp],
+    classOf[UnreachableMember],
+    classOf[MemberRemoved],
+    classOf[MemberExited],
+    classOf[LeaderChanged]
+  )
   override def postStop(): Unit = cluster.unsubscribe(self)
+
+  log.info("************ AkkaClusterBackend Actor")
 
   def receive = {
 
     case MemberUp(member) =>
-      logger.info("AkkaClusterBackend Member is Up: {}", member.address)
+      log.info("AkkaClusterBackend Member is Up: {}", member.address)
       register(member)
     case UnreachableMember(member) =>
-      logger.info("AkkaClusterBackend Member detected as unreachable: {}", member)
+      log.info("AkkaClusterBackend Member detected as unreachable: {}", member)
     case MemberRemoved(member, previousStatus) =>
-      logger.info("AkkaClusterBackend Member is Removed: {} after {}",
+      log.info("AkkaClusterBackend Member is Removed: {} after {}",
         member.address, previousStatus)
     case _: MemberEvent => // ignore
 
     case Job(name) =>
-      logger.info("AkkaClusterBackend Job " + name)
-      sender() ! "AkkaClusterBackend success " +name
+      log.info("AkkaClusterBackend Job " + name)
+      sender() ! s"AkkaClusterBackend success from host ${sys.env.get("BUNDLE_HOST_IP")} job:" + name
   }
 
   def register(member: Member): Unit ={
 
-    logger.info(s"AkkaClusterBackend register:member $member" )
+    log.info(s"AkkaClusterBackend register:member $member" )
 
     if (member.hasRole("frontend")) {
-      logger.info("AkkaClusterBackend front end is registered, sending BackendRegistration")
+      log.info("AkkaClusterBackend front end is registered, sending BackendRegistration")
       context.actorSelection(RootActorPath(member.address) / "user" / "akkaClusterFrontend") ! BackendRegistration
     }
 

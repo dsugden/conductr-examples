@@ -1,7 +1,7 @@
 package com.boldradius.conductr.examples
 
 import akka.actor._
-import akka.cluster.ClusterEvent.MemberEvent
+import akka.cluster.ClusterEvent._
 import akka.io.IO
 import akka.util.Timeout
 import akka.actor.ActorRef
@@ -25,7 +25,7 @@ import scala.util.{Failure, Success}
  */
 object AkkaClusterFrontend extends App with LazyLogging {
 
-  val config = Env.asConfig
+  val config = Env.asConfig.withFallback(ConfigFactory.load())
   val systemName = sys.env.getOrElse("BUNDLE_SYSTEM", "AkkaConductRExamplesClusterSystem")
 
   logger.info("systemName: " + systemName)
@@ -60,6 +60,7 @@ object AkkaClusterFrontend extends App with LazyLogging {
   logger.info(s"SEED NODES ${sys.props.get("akka.cluster.seed-nodes.0")}")
 
   implicit val system = ActorSystem(systemName, config.withFallback(ConfigFactory.load()))
+
 
   // start the frontend actor
   val frontEndActor = system.actorOf(Props(new AkkaClusterFrontend), name = "akkaClusterFrontend")
@@ -122,16 +123,23 @@ class FrontEndHttpActor(fEndActor: ActorRef)
  * This actor participates in the cluster, delegating Jobs from web to the
  * backend worked actors
  */
-class AkkaClusterFrontend() extends Actor with LazyLogging {
+class AkkaClusterFrontend() extends Actor with ActorLogging {
 
-  logger.info("new AkkaClusterFrontend()")
+  log.info("new AkkaClusterFrontend()")
 
   implicit val timeout = Timeout(5 seconds)
 
 
   val cluster = Cluster(context.system)
 
-  override def preStart(): Unit = cluster.subscribe(self, classOf[MemberEvent])
+  override def preStart(): Unit = cluster.subscribe(self,
+    initialStateMode = InitialStateAsEvents,
+    classOf[MemberUp],
+    classOf[UnreachableMember],
+    classOf[MemberRemoved],
+    classOf[MemberExited],
+    classOf[LeaderChanged]
+  )
   override def postStop(): Unit = cluster.unsubscribe(self)
 
 
@@ -143,15 +151,16 @@ class AkkaClusterFrontend() extends Actor with LazyLogging {
       sender() ! "Service unavailable, try again later"
 
     case j@Job(name) =>
+      context.become(service(backends, jobCounter + 1))
       backends(jobCounter % backends.size) forward j
 
     case BackendRegistration if !backends.contains(sender()) =>
-      logger.info("backend registered, adding to backends")
+      log.info("backend registered, adding to backends")
       context watch sender()
       context.become(service(backends :+ sender(), jobCounter))
 
     case Terminated(a) =>
-      logger.info("AkkaClusterFrontend Terminated " + a )
+      log.info("AkkaClusterFrontend Terminated " + a )
       context.become(service(backends.filterNot(_ == a), jobCounter))
   }
 }

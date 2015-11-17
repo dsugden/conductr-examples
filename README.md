@@ -34,7 +34,8 @@ As this plugin evolves, this repo will be updated.
 
 ##### build the akkacluster bundles
 
-There is a frontend and a backend. The frontend is the seed, and also has a spray http service.
+There is a frontend and a backend. When not run in conductr, the backend is the seed.
+
 
 The backend will join cluster, then register with front end. The frontend will forward work to the backend.
 
@@ -84,6 +85,11 @@ The test ConductR network in this repo will bring up a 4 node network with the f
 2. 192.168.77.22  akka.cluster.roles=[backend]
 3. 192.168.77.23  akka.cluster.roles=[frontend]
 4. 192.168.77.24  akka.cluster.roles=[backend]
+
+
+To view the roles in a conductr cluster, ssh to control server and:
+    
+    curl -s $(hostname):9005/members | python3 -m json.tool    
     
     
 In each of the sub-projects sbt projects specification, a role is assigned for that app eg:
