@@ -77,6 +77,22 @@ The backend will join cluster, then register with front end. The frontend will f
     conduct run <bundleId>
     
     
+    
+for bundle configuration:
+
+
+    sbt
+    project akkaclusterBack
+    set BundleKeys.configurationName := "stage"
+    clean
+    configuration:dist
+    bundle:dist
+    controlServer 192.168.77.20
+    conduct load <TAB>
+    conduct run <HASH>    
+    
+    
+    
 ##### ConductR roles
 
 The test ConductR network in this repo will bring up a 4 node network with the following akka.cluster.roles

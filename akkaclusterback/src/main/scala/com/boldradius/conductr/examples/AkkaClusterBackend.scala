@@ -8,10 +8,9 @@ import akka.cluster.ClusterEvent._
 import akka.io.IO
 import com.typesafe.conductr.bundlelib.akka.{ConnectionContext, StatusService, Env}
 //import com.typesafe.conductr.bundlelib.akka.{Env, ConnectionContext}
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.conductr.bundlelib.scala.ConnectionContext.Implicits.global
 import com.typesafe.conductr.bundlelib.akka.Env
-import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.LazyLogging
 import akka.pattern.pipe
 import spray.can.Http
@@ -36,22 +35,10 @@ object AkkaClusterBackend extends App with LazyLogging {
 
   logger.info(s"AkkaClusterBackend AKKA_REMOTE_HOST ${sys.env.get("AKKA_REMOTE_HOST")}")
 
-
-  logger.info(s"AkkaClusterBackend bundleHostIp ${sys.env.get("BUNDLE_HOST_IP")}")
-  logger.info(s"AkkaClusterBackend bundleSystem ${sys.env.get("BUNDLE_SYSTEM")}")
-  logger.info(s"AkkaClusterBackend akkaRemoteHostProtocol ${sys.env.get("AKKA_REMOTE_HOST_PROTOCOL")}")
-  logger.info(s"AkkaClusterBackend akkaRemoteHostPort ${sys.env.get("AKKA_REMOTE_HOST_PORT")}")
-  logger.info(s"AkkaClusterBackend akkaRemoteOtherProtocolsConcat ${sys.env.get("AKKA_REMOTE_OTHER_PROTOCOLS")}")
-  logger.info(s"AkkaClusterBackend akkaRemoteOtherIpsConcat ${sys.env.get("AKKA_REMOTE_OTHER_IPS")}")
-  logger.info(s"AkkaClusterBackend akkaRemoteOtherPortsConcat ${sys.env.get("AKKA_REMOTE_OTHER_PORTS")}")
-
-
-  logger.info(s"AkkaClusterBackend SEED NODES ${sys.props.get("akka.cluster.seed-nodes.0")}")
-
   implicit val system = ActorSystem(systemName, config.withFallback(ConfigFactory.load()))
 
   Cluster(system).registerOnMemberUp {
-    system.actorOf(Props(classOf[AkkaClusterBackend]))
+    system.actorOf(Props(classOf[AkkaClusterBackend], config))
 
     logger.info("AkkaClusterBackend registerOnMemberUp ")
     implicit val cc = ConnectionContext()
@@ -63,7 +50,7 @@ object AkkaClusterBackend extends App with LazyLogging {
 
 
 
-class AkkaClusterBackend extends Actor with ActorLogging  {
+class AkkaClusterBackend(config: Config) extends Actor with ActorLogging  {
 
   val cluster = Cluster(context.system)
 
@@ -93,7 +80,8 @@ class AkkaClusterBackend extends Actor with ActorLogging  {
 
     case Job(name) =>
       log.info("AkkaClusterBackend Job " + name)
-      sender() ! s"AkkaClusterBackend success from host ${sys.env.get("BUNDLE_HOST_IP")} job:" + name
+      sender() ! s"AkkaClusterBackend success from host ${sys.env.get("BUNDLE_HOST_IP")} job:" +
+        name +" password= " + config.getString("password")
   }
 
   def register(member: Member): Unit ={

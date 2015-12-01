@@ -1,4 +1,9 @@
 ---
+- name: Set Hostname
+  shell: 'hostname {{ conductr_ip }}'
+  become: yes
+  become_method: sudo
+
 - name: Install add-apt-repostory
   apt: name=software-properties-common state=latest update_cache=yes
 

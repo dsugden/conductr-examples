@@ -16,26 +16,28 @@
     - python3-pip
     - python-dev
     - python-setuptools
-  when: "{{ INSTALL_CLI }} == true"
+  when: "{{ IS_SEED }} == true"
 
 - name: Install ConductR CLI
   command: pip3 install -U conductr-cli
   become: yes
   become_method: sudo
-  when: "{{ INSTALL_CLI }} == true"
+  when: "{{ IS_SEED }} == true"
 
 
-- shell: 'echo -Dconductr.ip={{ conductr_ip }} | sudo tee -a /usr/share/conductr/conf/application.ini'
+- name: Set controlServer IP
+  shell: 'echo -Dconductr.ip={{ conductr_ip }} | sudo tee -a /usr/share/conductr/conf/application.ini'
   become: yes
   become_method: sudo
 
 
-- shell: 'echo -DCONDUCTR_IP={{ conductr_ip }} | sudo tee -a /usr/share/conductr/conf/application.ini'
+- name: Set conductr IP
+  shell: 'echo -DCONDUCTR_IP={{ conductr_ip }} | sudo tee -a /usr/share/conductr/conf/application.ini'
   become: yes
   become_method: sudo
 
 
-- shell: 'echo export CONDUCTR_IP=$(hostname -i) | sudo tee -a /etc/profile'
+- shell: 'echo export CONDUCTR_IP={{ conductr_ip }} | sudo tee -a /etc/profile'
   become: yes
   become_method: sudo
 
@@ -52,18 +54,11 @@
   become: yes
   become_method: sudo
 
-- shell: 'echo -Dcontrail.syslog.server.host=127.0.0.1 | sudo tee -a /usr/share/conductr/conf/application.ini'
+
+- shell: 'echo -Dconductr.run.bundle-scaler-starting-timeout=20m | sudo tee -a /usr/share/conductr/conf/application.ini'
   become: yes
   become_method: sudo
 
-
-- shell: 'echo -Dcontrail.syslog.server.port=9200 | sudo tee -a /usr/share/conductr/conf/application.ini'
-  become: yes
-  become_method: sudo
-
-- shell: 'echo -Dcontrail.syslog.server.elasticsearch.enabled=on | sudo tee -a /usr/share/conductr/conf/application.ini'
-  become: yes
-  become_method: sudo
 
 - shell: "echo '$ModLoad imtcp' | sudo tee -a /etc/rsyslog.d/conductr.conf"
   become: yes
@@ -74,44 +69,11 @@
   become_method: sudo
 
 
-- shell: "sudo mkdir -p /var/lib/elasticsearch /var/log/elasticsearch"
-  become: yes
-  become_method: sudo
-
-- shell: "sudo chown conductr:conductr /var/lib/elasticsearch"
-  become: yes
-  become_method: sudo
-
-
-- shell: "sudo chown conductr:conductr /var/log/elasticsearch"
-  become: yes
-  become_method: sudo
-
-
-
 - name: Set akka role
   shell:
     echo -Dakka.cluster.roles.0={{node_akka_role}} | sudo tee -a /usr/share/conductr/conf/application.ini
   become: yes
   become_method: sudo
-
-
-- name: Set elastic search role
-  shell:
-    echo -Dakka.cluster.roles.1=elasticsearch | sudo tee -a /usr/share/conductr/conf/application.ini
-  become: yes
-  become_method: sudo
-  when: "{{ INSTALL_ELASTIC_SEARCH }} == true"
-
-
-- name: Set kibana role
-  shell:
-    echo -Dakka.cluster.roles.2=kibana | sudo tee -a /usr/share/conductr/conf/application.ini
-  become: yes
-  become_method: sudo
-  when: "{{ INSTALL_KIBANA }} == true"
-
-
 
 - name: Set seed
   shell:

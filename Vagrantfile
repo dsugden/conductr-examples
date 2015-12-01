@@ -29,12 +29,9 @@ Vagrant.configure(2) do |config|
          conductr_ip:  "192.168.77.20",
          seed_ip: "192.168.77.20",
          node_akka_role: "web-server",
-         CONDUCTR_PKG: "conductr_1.0.11_all.deb",
-         CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
-         INSTALL_CLI: true,
-         INSTALL_ELASTIC_SEARCH: true,
-         INSTALL_KIBANA: true,
-         IS_SEED: false
+         CONDUCTR_PKG: "conductr_1.0.13_all.deb",
+         CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.13_all.deb",
+         IS_SEED: true
        }
        ansible.playbook = "ansible/build-cluster-vagrant-seed.yml"
        ansible.verbose = "vvv"
@@ -52,11 +49,8 @@ Vagrant.configure(2) do |config|
                 conductr_ip:  "192.168.77.2#{i}",
                 seed_ip: "192.168.77.20",
                 node_akka_role: "backend",
-                CONDUCTR_PKG: "conductr_1.0.11_all.deb",
-                CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
-                INSTALL_CLI: true,
-                INSTALL_ELASTIC_SEARCH: true,
-                INSTALL_KIBANA: false,
+                CONDUCTR_PKG: "conductr_1.0.13_all.deb",
+                CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.13_all.deb",
                 IS_SEED: false
               }
             else
@@ -64,11 +58,8 @@ Vagrant.configure(2) do |config|
                 conductr_ip:  "192.168.77.2#{i}",
                 seed_ip: "192.168.77.20",
                 node_akka_role: "frontend",
-                CONDUCTR_PKG: "conductr_1.0.11_all.deb",
-                CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.11_all.deb",
-                INSTALL_CLI: true,
-                INSTALL_ELASTIC_SEARCH: true,
-                INSTALL_KIBANA: false,
+                CONDUCTR_PKG: "conductr_1.0.13_all.deb",
+                CONDUCTR_HAPROXY_PKG: "conductr-haproxy_1.0.13_all.deb",
                 IS_SEED: false
               }
             end

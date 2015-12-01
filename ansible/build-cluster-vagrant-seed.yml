@@ -10,5 +10,3 @@
     - include: haproxy/tasks/main.yml
     - include: conductr/tasks/main.yml
     - include: visualizer/tasks/main.yml
-    - include: elasticsearch/tasks/main.yml
-    - include: kibana/tasks/main.yml

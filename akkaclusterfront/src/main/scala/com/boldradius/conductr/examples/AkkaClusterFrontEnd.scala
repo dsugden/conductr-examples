@@ -17,7 +17,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import akka.pattern.ask
 
-import scala.util.{Failure, Success}
+import scala.util.{Try, Failure, Success}
 
 
 /**
@@ -152,10 +152,10 @@ class AkkaClusterFrontend() extends Actor with ActorLogging {
 
     case j@Job(name) =>
       context.become(service(backends, jobCounter + 1))
-      backends(jobCounter % backends.size) forward j
+      Try{backends(jobCounter % backends.size) forward j}
 
-    case BackendRegistration if !backends.contains(sender()) =>
-      log.info("backend registered, adding to backends")
+    case BackendRegistration =>
+      log.info("***************** backend registered, adding to backends: " + sender())
       context watch sender()
       context.become(service(backends :+ sender(), jobCounter))
 
